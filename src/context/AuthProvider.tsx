@@ -1,0 +1,74 @@
+"use client";
+
+import {
+  clearServerSession,
+  createServerSession,
+  getFirebaseAuth,
+  signInWithGoogle,
+  signOut,
+} from "@/lib/firebaseClient";
+import type { User } from "firebase/auth";
+import React, { createContext, useContext, useEffect, useState } from "react";
+
+type AuthContextValue = {
+  user: User | null;
+  loading: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+};
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
+};
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const auth = getFirebaseAuth();
+    const unsub = auth.onAuthStateChanged((u: User | null) => {
+      setUser(u);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  async function handleSignIn() {
+    const res = await signInWithGoogle();
+    // Exchange the ID token for a secure server-side session cookie
+    try {
+      if (res && res.idToken) {
+        await createServerSession(res.idToken);
+      }
+    } catch (e) {
+      console.error("Failed to create server session", e);
+    }
+  }
+
+  async function handleSignOut() {
+    try {
+      await clearServerSession();
+    } catch (e) {
+      // ignore
+    }
+    await signOut();
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        signInWithGoogle: handleSignIn,
+        signOut: handleSignOut,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
