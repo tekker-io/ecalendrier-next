@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
 // Helper to check the session cookie
 function hasSessionCookie(req: NextRequest) {
-  const cookie = req.cookies.get("session");
-  return cookie !== undefined && cookie.value !== "";
+  const cookie = req.cookies.get('session');
+  return cookie !== undefined && cookie.value !== '';
 }
 
 export function middleware(request: NextRequest) {
@@ -13,15 +13,15 @@ export function middleware(request: NextRequest) {
 
   console.log(`Middleware: ${pathname}, logged in: ${isLoggedIn}`);
 
-  if (pathname === "/") {
+  if (pathname === '/') {
     if (isLoggedIn) {
-      return NextResponse.redirect(new URL("/calendars", request.url));
+      return NextResponse.redirect(new URL('/calendars', request.url));
     }
   }
 
-  if (pathname.startsWith("/calendars")) {
+  if (pathname.startsWith('/calendars') || pathname.startsWith('/premium')) {
     if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL('/', request.url));
     }
   }
 
@@ -29,5 +29,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!\\.well-known|_next/static|favicon\\.).*)"],
+  matcher: ['/((?!\\.well-known|_next/static|favicon\\.).*)'],
 };
