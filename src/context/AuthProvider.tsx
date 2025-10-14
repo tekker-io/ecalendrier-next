@@ -8,6 +8,7 @@ import {
   signOut,
 } from "@/lib/firebaseClient";
 import type { User } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type AuthContextValue = {
@@ -26,6 +27,7 @@ export const useAuth = () => {
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -44,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       if (res && res.idToken) {
         await createServerSession(res.idToken);
+        router.refresh();
       }
     } catch (e) {
       console.error("Failed to create server session", e);
@@ -53,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function handleSignOut() {
     try {
       await clearServerSession();
+      router.refresh();
     } catch (e) {
       // ignore
     }

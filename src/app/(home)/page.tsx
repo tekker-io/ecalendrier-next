@@ -2,6 +2,8 @@
 
 import { useAuth } from "@/context/AuthProvider";
 import Image from "next/image";
+import Link from "next/link";
+import { SocialButton } from "../components/social-button";
 
 export default function Home() {
   const { signInWithGoogle } = useAuth();
@@ -14,12 +16,25 @@ export default function Home() {
           Créez gratuitement votre calendrier de l&apos;avent
         </h2>
         <div className="flex flex-wrap">
-          {/* @Todo design the button */}
-          <button onClick={() => signInWithGoogle()}>
+          <SocialButton
+            onClick={() => signInWithGoogle()}
+            theme="blue"
+            img="/google.svg"
+            imgAlt="Google logo"
+          >
             Connexion avec Google
-          </button>
+          </SocialButton>
         </div>
-        <div className="w-20 h-0.5 bg-black my-7"></div>
+        <div className="w-20 h-0.5 bg-black my-7" />
+        <Link href="-MMm0AnXznQF1ZTaetrC">
+          <SocialButton
+            theme="black"
+            img="sample.svg"
+            imgAlt="Sample calendar icon"
+          >
+            Regarder un exemple
+          </SocialButton>
+        </Link>
       </div>
       <div className="flex-1 invisible md:visible flex">
         <Image

@@ -19,6 +19,13 @@ if (!admin.apps.length) {
   }
 }
 
+// Helper to check the session cookie
+export async function checkIsLoggedIn() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('session')?.value;
+  return sessionCookie !== undefined && sessionCookie !== '';
+}
+
 export async function getUserFromCookie() {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('session')?.value;

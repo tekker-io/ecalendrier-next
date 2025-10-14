@@ -1,4 +1,5 @@
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
+import Link from "next/link";
 import { LogoutButton } from "../components/logout-button";
 
 type Calendar = {
@@ -21,20 +22,39 @@ export default async function CalendarsPage() {
   }));
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">My calendars</h1>
-      {calendars.length === 0 ? (
-        <p className="mt-4">You have no calendars yet.</p>
-      ) : (
-        <ul className="mt-4 list-disc pl-6">
-          {calendars.map((c) => (
-            <li key={c.id} className="py-1">
-              {c.name}
-            </li>
-          ))}
-        </ul>
-      )}
-      <LogoutButton />
-    </div>
+    <>
+      <h1 className="text-4xl mb-4">Bonjour !</h1>
+      <h2 className="text-2xl mb-3">Mes calendriers :</h2>
+      <div className="mb-6 flex flex-wrap">
+        {calendars.map((c) => (
+          <Link
+            key={c.id}
+            href={`/edit/${c.id}`}
+            className="rounded mr-2 mb-2 flex p-8 border-2 border-solid border-gray-100 hover:bg-gray-100 hover:text-black bg-white/30"
+          >
+            {c.name}
+          </Link>
+        ))}
+        <div
+          className="
+        rounded
+        mr-2
+        mb-2
+        flex
+        p-8
+        border-2 border-dashed
+        cursor-pointer
+        border-gray-100
+        hover:bg-gray-100 hover:text-black
+        bg-white/30
+      "
+        >
+          + Ajouter un calendrier
+        </div>
+      </div>
+      <div className="mb-1">
+        <LogoutButton />
+      </div>
+    </>
   );
 }

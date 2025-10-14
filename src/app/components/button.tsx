@@ -2,16 +2,19 @@ export function Button({
   type = "button",
   size = "normal",
   theme = "transparent",
+  onClick,
   children,
 }: {
   type?: "button" | "submit" | "reset";
   size?: "small" | "normal" | "large";
   theme?: "dark" | "transparent" | "danger" | "success";
+  onClick?: () => void;
   children: React.ReactNode;
 }) {
   return (
     <button
       type={type}
+      onClick={onClick}
       className={`flex items-center gap-1 rounded cursor-pointer py-2 ${
         size === "small" ? "px-2" : size === "normal" ? "px-4" : "px-6"
       } ${

@@ -3,6 +3,8 @@
 @theme {
   --color-black: oklch(0.3211 0 0);
   --color-red: oklch(0.6013 0.2443 25.86);
+  --color-blue: oklch(0.6304 0.18 259.96);
+  --color-green: oklch(0.614 0.0913 197.88);
 }
 
 body {

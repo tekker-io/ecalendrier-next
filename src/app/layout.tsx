@@ -1,5 +1,5 @@
 import { AuthProvider } from "@/context/AuthProvider";
-import { getUserFromCookie } from "@/lib/firebaseAdmin";
+import { checkIsLoggedIn } from "@/lib/firebaseAdmin";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import Link from "next/link";
@@ -24,7 +24,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getUserFromCookie();
+  const isLoggedIn = await checkIsLoggedIn();
 
   return (
     <html lang="fr" className={`h-full ${roboto.className}`}>
@@ -39,7 +39,7 @@ export default async function RootLayout({
                 "linear-gradient(104.42deg, rgba(100, 150, 101, 0.4) 0.83%, rgba(240, 0, 35, 0.4) 98.12%)",
             }}
           >
-            {user && <TopBar />}
+            {isLoggedIn && <TopBar />}
             <AuthProvider>{children}</AuthProvider>
           </div>
         </div>
