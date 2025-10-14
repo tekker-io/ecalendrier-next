@@ -1,5 +1,5 @@
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
-import { LoggoutButton } from "../components/loggout-button";
+import { LogoutButton } from "../components/logout-button";
 
 type Calendar = {
   id: string;
@@ -34,7 +34,7 @@ export default async function CalendarsPage() {
           ))}
         </ul>
       )}
-      <LoggoutButton />
+      <LogoutButton />
     </div>
   );
 }
