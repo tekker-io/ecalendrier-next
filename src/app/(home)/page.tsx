@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthProvider";
 import Image from "next/image";
 
 export default function Home() {
-  const { user, loading, signInWithGoogle, signOut } = useAuth();
+  const { signInWithGoogle } = useAuth();
 
   return (
     <main className="flex">
