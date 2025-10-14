@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --color-black: #333333;
+  --color-black: oklch(0.3211 0 0);
+  --color-red: oklch(0.6013 0.2443 25.86);
 }
 
 body {

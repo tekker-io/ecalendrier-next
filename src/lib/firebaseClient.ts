@@ -1,10 +1,11 @@
-import { getApp, getApps, initializeApp } from "firebase/app";
+import { getAnalytics, logEvent } from 'firebase/analytics';
+import { getApp, getApps, initializeApp } from 'firebase/app';
 import {
   signOut as firebaseSignOut,
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
-} from "firebase/auth";
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -26,13 +27,18 @@ export function initFirebase() {
   } catch (err) {
     // ignore initialization errors in dev when env vars missing
     // caller can still attempt to use auth and handle nulls
-    console.warn("Firebase initialization warning:", err);
+    console.warn('Firebase initialization warning:', err);
   }
 }
 
 export function getFirebaseAuth() {
   initFirebase();
   return getAuth();
+}
+
+export function sendEvent(name: string) {
+  const analytics = getAnalytics();
+  logEvent(analytics, name);
 }
 
 export const googleProvider = new GoogleAuthProvider();
@@ -52,13 +58,13 @@ export async function signOut() {
 
 export async function createServerSession(idToken: string) {
   // Call server endpoint to exchange ID token for a secure session cookie
-  return fetch("/api/session/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  return fetch('/api/session/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ idToken }),
   });
 }
 
 export async function clearServerSession() {
-  return fetch("/api/session/logout", { method: "POST" });
+  return fetch('/api/session/logout', { method: 'POST' });
 }

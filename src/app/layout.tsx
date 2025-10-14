@@ -1,6 +1,9 @@
 import { AuthProvider } from "@/context/AuthProvider";
+import { getUserFromCookie } from "@/lib/firebaseAdmin";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
+import Link from "next/link";
+import { TopBar } from "./components/top-bar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -8,15 +11,21 @@ export const metadata: Metadata = {
   description: "eCalendrier",
 };
 
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+config.autoAddCss = false;
+
 const roboto = Roboto({
   subsets: ["latin"],
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getUserFromCookie();
+
   return (
     <html lang="fr" className={`h-full ${roboto.className}`}>
       <body
@@ -30,12 +39,13 @@ export default function RootLayout({
                 "linear-gradient(104.42deg, rgba(100, 150, 101, 0.4) 0.83%, rgba(240, 0, 35, 0.4) 98.12%)",
             }}
           >
+            {user && <TopBar />}
             <AuthProvider>{children}</AuthProvider>
           </div>
         </div>
         <div className="absolute bottom-0 bg-black w-full">
           <div className="w-4/5 max-w-7xl m-auto">
-            <a href="/privacy">Politique de confidentialité</a>
+            <Link href="/privacy">Politique de confidentialité</Link>
           </div>
         </div>
       </body>
