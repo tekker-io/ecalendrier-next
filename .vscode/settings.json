@@ -22,6 +22,6 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["ecalendrier"],
+  "cSpell.words": ["ecalendrier", "Firestore"],
   "typescript.tsdk": "node_modules/typescript/lib"
 }

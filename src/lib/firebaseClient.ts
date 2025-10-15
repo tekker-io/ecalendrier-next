@@ -1,11 +1,12 @@
 import { getAnalytics, logEvent } from 'firebase/analytics';
-import { getApp, getApps, initializeApp } from 'firebase/app';
+import { getApps, initializeApp } from 'firebase/app';
 import {
   signOut as firebaseSignOut,
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -20,9 +21,6 @@ export function initFirebase() {
   try {
     if (!getApps().length) {
       initializeApp(firebaseConfig);
-    } else {
-      // already initialized
-      getApp();
     }
   } catch (err) {
     // ignore initialization errors in dev when env vars missing
@@ -36,7 +34,13 @@ export function getFirebaseAuth() {
   return getAuth();
 }
 
+export function getFirebaseFirestore() {
+  initFirebase();
+  return getFirestore();
+}
+
 export function sendEvent(name: string) {
+  initFirebase();
   const analytics = getAnalytics();
   logEvent(analytics, name);
 }
