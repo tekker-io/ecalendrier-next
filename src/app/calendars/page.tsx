@@ -1,5 +1,6 @@
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import { LogoutButton } from "../components/logout-button";
+import { TopBar } from "../components/top-bar";
 import { Calendars } from "./calendars";
 
 export type CalendarList = {
@@ -10,7 +11,6 @@ export type CalendarList = {
 export default async function CalendarsPage() {
   const user = await getUserFromCookie();
 
-  // Query Firestore for calendars authored by this uid
   const db = admin.firestore();
   const snap = await db
     .collection("calendars")
@@ -24,6 +24,7 @@ export default async function CalendarsPage() {
 
   return (
     <>
+      <TopBar />
       <h1 className="text-4xl mb-4">Bonjour !</h1>
       <h2 className="text-2xl mb-3">Mes calendriers :</h2>
       <Calendars calendars={calendars} />

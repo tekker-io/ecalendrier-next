@@ -2,6 +2,7 @@ import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+import { TopBar } from "../components/top-bar";
 
 export default async function PremiumPage() {
   const user = await getUserFromCookie();
@@ -13,10 +14,9 @@ export default async function PremiumPage() {
 
   const stripeLink = process.env.NEXT_PUBLIC_STRIPE_LINK;
 
-  console.log(premium, user.uid);
-
   return (
-    <div>
+    <>
+      <TopBar />
       <h1 className="text-5xl mb-4 text-yellow-100 flex items-center justify-center">
         <FontAwesomeIcon icon={faStar} className="text-base" />
         Mode premium
@@ -72,6 +72,6 @@ export default async function PremiumPage() {
         )}
       </div>
       <div></div>
-    </div>
+    </>
   );
 }

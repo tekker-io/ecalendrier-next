@@ -1,10 +1,8 @@
 import { AuthProvider } from "@/context/AuthProvider";
-import { checkIsLoggedIn } from "@/lib/firebaseAdmin";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import Link from "next/link";
-import { TopBar } from "./components/top-bar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,8 +23,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isLoggedIn = await checkIsLoggedIn();
-
   return (
     <html lang="fr" className={`h-full ${roboto.className}`}>
       <body
@@ -41,7 +37,6 @@ export default async function RootLayout({
                   "linear-gradient(104.42deg, rgba(100, 150, 101, 0.4) 0.83%, rgba(240, 0, 35, 0.4) 98.12%)",
               }}
             >
-              {isLoggedIn && <TopBar />}
               <AuthProvider>{children}</AuthProvider>
             </div>
           </div>
