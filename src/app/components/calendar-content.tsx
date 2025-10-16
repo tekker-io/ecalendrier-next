@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/context/AuthProvider";
 import { getFile, sendEvent, writeFile } from "@/lib/firebaseClient";
 import EditIcon from "@mui/icons-material/Edit";
 import Dialog from "@mui/material/Dialog";
@@ -8,6 +9,7 @@ import Switch from "@mui/material/Switch";
 import Tooltip from "@mui/material/Tooltip";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar } from "../entities";
 import { Button } from "./button";
@@ -35,6 +37,7 @@ function DayDialog({
   const [preview, setPreview] = useState(false);
   const [fileContent, setFileContent] = useState<string>("");
   const quillRef = useRef<HTMLDivElement>(null);
+  const { premium } = useAuth();
 
   useEffect(() => {
     setLoading(true);
@@ -49,6 +52,7 @@ function DayDialog({
   }, [fileName]);
 
   function save() {
+    if (!premium && fileContent.length > 2000000) return;
     setSaving(true);
     sendEvent("Save day");
     writeFile(fileName, fileContent).then(() => {
@@ -95,6 +99,16 @@ function DayDialog({
                   {saving ? <Spinner /> : "OK"}
                 </Button>
               </div>
+            )}
+            {editing && !premium && fileContent.length > 2000000 && (
+              <p className="text-red mt-4">
+                Chaque jour est limité à 2Mo de données, essayez de réduire la
+                taille de vos images ou{" "}
+                <Link href="/premium" target="_blank" className="!underline">
+                  activez le mode premium
+                </Link>
+                .
+              </p>
             )}
           </>
         )}

@@ -16,6 +16,7 @@ type AuthContextValue = {
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  premium: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -26,7 +27,13 @@ export const useAuth = () => {
   return ctx;
 };
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({
+  children,
+  premium,
+}: {
+  children: React.ReactNode;
+  premium: boolean;
+}) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         signInWithGoogle: handleSignIn,
         signOut: handleSignOut,
+        premium: premium,
       }}
     >
       {children}
