@@ -18,23 +18,26 @@ export default async function CalendarPage({
     : {
         id: doc.id,
         name: doc.get("name"),
-        displayLogo: doc.get("displayLogo") || true,
-        displayCta: doc.get("displayCta") || true,
+        displayLogo: doc.get("displayLogo") ?? true,
+        displayCta: doc.get("displayCta") ?? true,
         demo: doc.get("demo") || false,
         startDate: doc.get("startDate"),
         endDate: doc.get("endDate"),
         author: doc.get("author"),
       };
 
+  console.log(calendar);
+
   return (
     <>
       {(!calendar || calendar.displayLogo || calendar.displayCta) && (
         <div className="mb-14 flex justify-between items-center flex-col md:flex-row">
-          {(!calendar || calendar.displayLogo) && (
-            <Link href="/">
+          <Link href="/">
+            {(!calendar || calendar.displayLogo) && (
               <Image src="/logo.svg" alt="logo" width="212" height="59" />
-            </Link>
-          )}
+            )}
+          </Link>
+
           {(!calendar || calendar.displayCta) && (
             <div className="flex items-center text-white mt-4 d:mt-0 text-center">
               <Link href="/">

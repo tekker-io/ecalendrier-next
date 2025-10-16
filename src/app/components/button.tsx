@@ -25,7 +25,7 @@ export function Button({
           : theme === "dark"
           ? "bg-black hover:bg-black/90"
           : "bg-black/0 hover:bg-black/10"
-      } text-white`}
+      } ${["danger", "success"].includes(theme) && "text-white"} `}
     >
       {children}
     </button>

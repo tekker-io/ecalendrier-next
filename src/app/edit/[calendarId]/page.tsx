@@ -5,6 +5,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { Button } from "../../components/button";
 import { CalendarContent } from "../../components/calendar-content";
 import { Calendar } from "../../entities";
+import DeleteCalendar from "./delete";
 import { ShareButton } from "./share";
 
 export default async function CalendarPage({
@@ -52,6 +53,7 @@ export default async function CalendarPage({
             </div>
           </h1>
           <CalendarContent calendar={calendar} editing />
+          <DeleteCalendar calendar={calendar} />
         </>
       )}
     </>
