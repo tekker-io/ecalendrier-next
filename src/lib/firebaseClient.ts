@@ -7,7 +7,12 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { getDownloadURL, getStorage, ref } from 'firebase/storage';
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadString,
+} from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -26,7 +31,7 @@ export function initFirebase() {
       auth.onIdTokenChanged(async (user) => {
         if (user) {
           // Force refresh regardless of token age.
-          const idToken = await user.getIdToken(true);
+          const idToken = await user.getIdToken();
           await createServerSession(idToken);
         }
       });
@@ -47,9 +52,15 @@ export async function getFile(filename: string) {
   initFirebase();
   const storage = getStorage();
   const url = await getDownloadURL(ref(storage, filename));
-  console.log(url);
   const data = await fetch(url);
   return await data.text();
+}
+
+export async function writeFile(filename: string, content: string) {
+  initFirebase();
+  const storage = getStorage();
+  const fileRef = ref(storage, filename);
+  await uploadString(fileRef, content);
 }
 
 export function getFirebaseFirestore() {

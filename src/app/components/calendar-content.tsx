@@ -1,13 +1,19 @@
 "use client";
 
-import { getFile } from "@/lib/firebaseClient";
+import { getFile, sendEvent, writeFile } from "@/lib/firebaseClient";
+import EditIcon from "@mui/icons-material/Edit";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
+import Switch from "@mui/material/Switch";
 import Tooltip from "@mui/material/Tooltip";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar } from "../entities";
+import { Button } from "./button";
 import { Spinner } from "./spinner";
+
+const Editor = dynamic(() => import("./editor"), { ssr: false });
 
 interface Day {
   date: number;
@@ -18,34 +24,79 @@ interface Day {
 function DayDialog({
   onClose,
   fileName,
-  edit,
+  editing,
 }: {
   onClose: () => void;
   fileName: string;
-  edit: boolean;
+  editing: boolean;
 }) {
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [preview, setPreview] = useState(false);
   const [fileContent, setFileContent] = useState<string>("");
+  const quillRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoading(true);
-    getFile(fileName).then((fileContent) => {
-      console.log(fileContent);
-      setFileContent(fileContent);
-      setLoading(false);
-    });
+    getFile(fileName)
+      .then((fileContent) => {
+        setFileContent(fileContent);
+      })
+      .catch(() => {
+        setFileContent("");
+      })
+      .finally(() => setLoading(false));
   }, [fileName]);
 
+  function save() {
+    setSaving(true);
+    sendEvent("Save day");
+    writeFile(fileName, fileContent).then(() => {
+      setSaving(false);
+      onClose();
+    });
+  }
+
   return (
-    <Dialog open={true} onClose={onClose}>
+    <Dialog open={true} onClose={onClose} maxWidth="lg">
       <DialogContent>
         {loading ? (
-          <Spinner />
+          <Spinner color="black" />
         ) : (
-          <div
-            className="ql-editor"
-            dangerouslySetInnerHTML={{ __html: fileContent }}
-          />
+          <>
+            {editing && (
+              <div className="mb-3 text-right">
+                Prévisualiser:{" "}
+                <Switch value={preview} onChange={() => setPreview(!preview)} />
+              </div>
+            )}
+            {editing && !preview && (
+              <Editor
+                ref={quillRef}
+                defaultValue={fileContent}
+                onTextChange={(text) => {
+                  setFileContent(text);
+                }}
+              />
+            )}
+            {(!editing || preview) && (
+              <div
+                className="ql-editor"
+                dangerouslySetInnerHTML={{
+                  __html:
+                    fileContent ||
+                    "<i>Le père noël n'est pas encore passé par là...</i>",
+                }}
+              />
+            )}
+            {editing && (
+              <div className="mt-4">
+                <Button onClick={() => save()} theme="success">
+                  {saving ? <Spinner /> : "OK"}
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </DialogContent>
     </Dialog>
@@ -127,7 +178,7 @@ export function CalendarContent({
         <DayDialog
           onClose={() => setOpenFileName(null)}
           fileName={openFileName}
-          edit={editing}
+          editing={editing}
         />
       )}
       {days.map((day) => (
@@ -147,6 +198,11 @@ export function CalendarContent({
               "hover:bg-gray-100 hover:text-black cursor-pointer"
             } rounded mb-6 mx-3 flex p-6 relative border border-white/30`}
           >
+            {editing && (
+              <span className="absolute text-white flex rounded-full bg-green -top-5 -right-5 w-10 h-10 justify-center items-center">
+                <EditIcon />
+              </span>
+            )}
             <span className="absolute text-lg">{day.date}</span>
             <Image
               alt="Cadeau"
