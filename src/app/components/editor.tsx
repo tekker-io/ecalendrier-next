@@ -4,7 +4,10 @@
 // from https://quilljs.com/playground/react
 
 import Quill from "quill";
+import { MediaResize } from "quill-media-resize";
 import { RefObject, useEffect, useLayoutEffect, useRef } from "react";
+
+Quill.register("modules/mediaResize", MediaResize);
 
 export default function Editor({
   readOnly = false,
@@ -51,6 +54,7 @@ export default function Editor({
           [{ align: [] }],
           ["link", "image", "video"],
         ],
+        mediaResize: {},
       },
     });
 
