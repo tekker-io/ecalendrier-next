@@ -30,7 +30,6 @@ export function initFirebase() {
       const auth = getAuth();
       auth.onIdTokenChanged(async (user) => {
         if (user) {
-          // Force refresh regardless of token age.
           const idToken = await user.getIdToken();
           await createServerSession(idToken);
         }
