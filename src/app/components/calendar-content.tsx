@@ -42,7 +42,10 @@ function DayDialog({
         {loading ? (
           <Spinner />
         ) : (
-          <div dangerouslySetInnerHTML={{ __html: fileContent }} />
+          <div
+            className="ql-editor"
+            dangerouslySetInnerHTML={{ __html: fileContent }}
+          />
         )}
       </DialogContent>
     </Dialog>
