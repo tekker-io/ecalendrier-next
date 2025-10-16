@@ -1,11 +1,11 @@
 import { TopBar } from "@/app/components/top-bar";
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import SettingsIcon from "@mui/icons-material/Settings";
-import ShareIcon from "@mui/icons-material/Share";
 import Tooltip from "@mui/material/Tooltip";
 import { Button } from "../../components/button";
 import { CalendarContent } from "../../components/calendar-content";
 import { Calendar } from "../../entities";
+import { ShareButton } from "./share";
 
 export default async function CalendarPage({
   params,
@@ -41,16 +41,13 @@ export default async function CalendarPage({
           <h1 className="flex flex-wrap justify-between">
             <div className="text-3xl">{calendar.name}</div>
             <div className="flex">
-              <Tooltip title="Partager">
-                <Button theme="success">
-                  Partager
-                  <ShareIcon className="ml-1" />
-                </Button>
-              </Tooltip>
+              <ShareButton calendar={calendar} />
               <Tooltip title="Options" className="ml-2">
-                <Button theme="dark">
-                  <SettingsIcon />
-                </Button>
+                <div>
+                  <Button theme="dark">
+                    <SettingsIcon />
+                  </Button>
+                </div>
               </Tooltip>
             </div>
           </h1>
