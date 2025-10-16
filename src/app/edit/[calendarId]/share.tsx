@@ -13,11 +13,9 @@ import { useState } from "react";
 
 function ShareDialog({
   calendar,
-  open,
   onClose,
 }: {
   calendar: Calendar;
-  open: boolean;
   onClose: () => void;
 }) {
   const [snackBarOpen, setSnackBarOpen] = useState<boolean>(false);
@@ -32,7 +30,7 @@ function ShareDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg">
+    <Dialog open onClose={onClose} maxWidth="lg">
       <DialogContent className="p-10">
         <Portal container={document.body}>
           <Snackbar
@@ -100,11 +98,7 @@ export function ShareButton({ calendar }: { calendar: Calendar }) {
   return (
     <>
       {dialogOpen && (
-        <ShareDialog
-          calendar={calendar}
-          open={dialogOpen}
-          onClose={() => setDialogOpen(false)}
-        />
+        <ShareDialog calendar={calendar} onClose={() => setDialogOpen(false)} />
       )}
 
       <Tooltip title="Partager">
