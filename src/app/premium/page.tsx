@@ -1,6 +1,5 @@
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import StarIcon from "@mui/icons-material/Star";
 import Link from "next/link";
 import { TopBar } from "../components/top-bar";
 
@@ -18,9 +17,9 @@ export default async function PremiumPage() {
     <>
       <TopBar />
       <h1 className="text-5xl mb-4 text-yellow-100 flex items-center justify-center">
-        <FontAwesomeIcon icon={faStar} className="text-base" />
+        <StarIcon />
         Mode premium
-        <FontAwesomeIcon icon={faStar} className="text-base" />
+        <StarIcon />
       </h1>
       <div className="text-lg">
         <p>
@@ -48,17 +47,17 @@ export default async function PremiumPage() {
         <div className="flex justify-center my-4">
           {premium ? (
             <div className="bg-emerald-500 text-black rounded py-2 px-4 lg:py-4 flex items-center gap-2">
-              <FontAwesomeIcon icon={faStar} />
-              Vous êtes premium, merci !<FontAwesomeIcon icon={faStar} />
+              <StarIcon />
+              Vous êtes premium, merci !<StarIcon />
             </div>
           ) : (
             <Link
               href={stripeLink + "?client_reference_id=" + user?.uid}
               className="bg-yellow-400 text-black rounded py-2 px-4 lg:py-4 flex items-center gap-2"
             >
-              <FontAwesomeIcon icon={faStar} />
+              <StarIcon />
               Activer le mode premium
-              <FontAwesomeIcon icon={faStar} />
+              <StarIcon />
             </Link>
           )}
         </div>

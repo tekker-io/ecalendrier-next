@@ -1,9 +1,9 @@
 "use client";
 
 import { sendEvent } from "@/lib/firebaseClient";
-import { faFacebook } from "@fortawesome/free-brands-svg-icons";
-import { faEnvelope, faStar } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import EmailIcon from "@mui/icons-material/Email";
+import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
+import StarIcon from "@mui/icons-material/Star";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./button";
@@ -30,7 +30,7 @@ export function TopBar() {
           target="_blank"
         >
           <Button size="small">
-            <FontAwesomeIcon icon={faFacebook} size="lg" />
+            <FacebookRoundedIcon />
           </Button>
         </a>
         <Link
@@ -41,7 +41,7 @@ export function TopBar() {
           <div className="mr-2">
             <Button>
               Contacter
-              <FontAwesomeIcon icon={faEnvelope} size="lg" />
+              <EmailIcon />
             </Button>
           </div>
         </Link>
@@ -50,7 +50,7 @@ export function TopBar() {
           className="bg-red rounded py-2 px-4 lg:py-4 flex items-center gap-2"
           onClick={() => sendEvent("Click on premium")}
         >
-          <FontAwesomeIcon icon={faStar} size="lg" />
+          <StarIcon />
           Mode premium
         </Link>
       </div>

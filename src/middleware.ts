@@ -19,7 +19,11 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  if (pathname.startsWith('/calendars') || pathname.startsWith('/premium')) {
+  if (
+    pathname.startsWith('/calendars') ||
+    pathname.startsWith('/premium') ||
+    pathname.startsWith('/edit')
+  ) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL('/', request.url));
     }
