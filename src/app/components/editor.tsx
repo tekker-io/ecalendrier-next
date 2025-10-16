@@ -38,6 +38,20 @@ export default function Editor({
     );
     const quill = new Quill(editorContainer, {
       theme: "snow",
+      placeholder: "Écrivez quelque chose...",
+      modules: {
+        toolbar: [
+          ["bold", "italic", "underline", "strike"],
+          [{ header: 1 }, { header: 2 }],
+          [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+          [{ size: ["small", false, "large", "huge"] }],
+          [{ header: [1, 2, 3, 4, 5, 6, false] }],
+          [{ color: [] }, { background: [] }],
+          [{ font: [] }],
+          [{ align: [] }],
+          ["link", "image", "video"],
+        ],
+      },
     });
 
     ref.current = quill;
