@@ -6,4 +6,5 @@ export type Calendar = {
   demo: boolean;
   startDate: string;
   endDate: string;
+  author: string;
 };

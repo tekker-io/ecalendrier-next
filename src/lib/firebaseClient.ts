@@ -7,6 +7,7 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -32,6 +33,15 @@ export function initFirebase() {
 export function getFirebaseAuth() {
   initFirebase();
   return getAuth();
+}
+
+export async function getFile(filename: string) {
+  initFirebase();
+  const storage = getStorage();
+  const url = await getDownloadURL(ref(storage, filename));
+  console.log(url);
+  const data = await fetch(url);
+  return await data.text();
 }
 
 export function getFirebaseFirestore() {

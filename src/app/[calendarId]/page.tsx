@@ -23,6 +23,7 @@ export default async function CalendarPage({
         demo: doc.get("demo") || false,
         startDate: doc.get("startDate"),
         endDate: doc.get("endDate"),
+        author: doc.get("author"),
       };
 
   return (
