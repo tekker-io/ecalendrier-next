@@ -14,3 +14,7 @@ body {
   background-image: url("/bg.webp");
   color: white;
 }
+
+a {
+  text-decoration: inherit;
+}
