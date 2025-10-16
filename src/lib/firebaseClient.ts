@@ -22,6 +22,14 @@ export function initFirebase() {
   try {
     if (!getApps().length) {
       initializeApp(firebaseConfig);
+      const auth = getAuth();
+      auth.onIdTokenChanged(async (user) => {
+        if (user) {
+          // Force refresh regardless of token age.
+          const idToken = await user.getIdToken(true);
+          await createServerSession(idToken);
+        }
+      });
     }
   } catch (err) {
     // ignore initialization errors in dev when env vars missing
