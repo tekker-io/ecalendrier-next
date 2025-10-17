@@ -1,10 +1,28 @@
 import admin from "@/lib/firebaseAdmin";
 import Link from "@mui/material/Link";
-import Head from "next/head";
 import Image from "next/image";
 import { Button } from "../components/button";
 import { CalendarContent } from "../components/calendar-content";
 import { Calendar } from "../entities";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { calendarId: string };
+}) {
+  const { calendarId } = await params;
+  const db = admin.firestore();
+  const doc = await db.collection("calendars").doc(calendarId).get();
+  const name = doc.get("name");
+
+  return {
+    title: `${name && name + " - "}Calendrier de l&apos;avent`,
+    openGraph: {
+      title: `${name && name + " - "}Calendrier de l&apos;avent`,
+    },
+    description: `Calendrier de l'avent en ligne${name && " - " + name}`,
+  };
+}
 
 export default async function CalendarPage({
   params,
@@ -29,24 +47,6 @@ export default async function CalendarPage({
 
   return (
     <>
-      <Head>
-        <title>
-          {calendar && calendar.name + " - "}Calendrier de l&apos;avent
-        </title>
-        <meta
-          property="og:title"
-          content={`${
-            calendar && calendar.name + " - "
-          }Calendrier de l&apos;avent`}
-          key="title"
-        />
-        <meta
-          name="description"
-          content={`Calendrier de l'avent en ligne${
-            calendar && " - " + calendar.name
-          }`}
-        />
-      </Head>
       {(!calendar || calendar.displayLogo || calendar.displayCta) && (
         <div className="mb-14 flex justify-between items-center flex-col md:flex-row">
           <Link href="/">
