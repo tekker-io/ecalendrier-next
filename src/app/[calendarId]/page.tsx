@@ -16,9 +16,9 @@ export async function generateMetadata({
   const name = doc.get("name");
 
   return {
-    title: `${name && name + " - "}Calendrier de l&apos;avent`,
+    title: `${name && name + " - "}Calendrier de l'avent`,
     openGraph: {
-      title: `${name && name + " - "}Calendrier de l&apos;avent`,
+      title: `${name && name + " - "}Calendrier de l'avent`,
     },
     description: `Calendrier de l'avent en ligne${name && " - " + name}`,
   };
