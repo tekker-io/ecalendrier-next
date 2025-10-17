@@ -20,6 +20,13 @@ a {
   text-decoration: inherit;
 }
 
-.ql-editor img {
+.ql-editor img,
+.ql-editor svg,
+.ql-editor video,
+.ql-editor canvas,
+.ql-editor audio,
+.ql-editor iframe,
+.ql-editor embed,
+.ql-editor object {
   display: inline-block;
 }
