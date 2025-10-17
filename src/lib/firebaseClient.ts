@@ -1,4 +1,8 @@
-import { getAnalytics, logEvent } from 'firebase/analytics';
+import {
+  getAnalytics,
+  initializeAnalytics,
+  logEvent,
+} from 'firebase/analytics';
 import { getApps, initializeApp } from 'firebase/app';
 import {
   signOut as firebaseSignOut,
@@ -27,7 +31,8 @@ const firebaseConfig = {
 export function initFirebase() {
   try {
     if (!getApps().length) {
-      initializeApp(firebaseConfig);
+      const app = initializeApp(firebaseConfig);
+      initializeAnalytics(app);
       const auth = getAuth();
       auth.onIdTokenChanged(async (user) => {
         if (user) {
