@@ -28,5 +28,5 @@ a {
 .ql-editor iframe,
 .ql-editor embed,
 .ql-editor object {
-  display: inline-block;
+  display: inline-block !important;
 }
