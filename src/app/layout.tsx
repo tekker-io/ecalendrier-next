@@ -9,6 +9,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "eCalendrier - Calendrier de l'avent en ligne",
   description: "eCalendrier",
+  openGraph: {
+    images: "/bg.webp",
+  },
 };
 
 const roboto = Roboto({
