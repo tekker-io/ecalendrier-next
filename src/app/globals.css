@@ -25,7 +25,6 @@ a {
 .ql-editor video,
 .ql-editor canvas,
 .ql-editor audio,
-.ql-editor iframe,
 .ql-editor embed,
 .ql-editor object {
   display: inline-block !important;
