@@ -43,10 +43,6 @@ function SettingsDialog({
       onClose(newValues);
     });
   }
-  // 1 save
-  // 2 send to onCLose
-  // 3 update "calendar-content" with new values
-  // 4 test premium
 
   return (
     <Dialog open onClose={onClose}>
