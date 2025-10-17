@@ -31,7 +31,7 @@ export async function getUserFromCookie() {
   const sessionCookie = cookieStore.get('session')?.value;
   if (!sessionCookie) throw new Error('No session cookie');
   try {
-    return await admin.auth().verifySessionCookie(sessionCookie, true);
+    return await admin.auth().verifySessionCookie(sessionCookie);
   } catch {
     throw new Error('Invalid session cookie');
   }
