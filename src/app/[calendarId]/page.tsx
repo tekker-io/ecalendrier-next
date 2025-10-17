@@ -19,6 +19,7 @@ export async function generateMetadata({
     title: `${name && name + " - "}Calendrier de l'avent`,
     openGraph: {
       title: `${name && name + " - "}Calendrier de l'avent`,
+      images: "/bg.webp",
     },
     description: `Calendrier de l'avent en ligne${name && " - " + name}`,
   };
