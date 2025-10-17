@@ -124,11 +124,10 @@ export function CalendarContent({
   editing?: boolean;
   calendar: Calendar;
 }) {
-  const [localCalendar] = useState(calendar);
   const [openFileName, setOpenFileName] = useState<string | null>(null);
 
   const [startDate, endDate] = useMemo(() => {
-    if (localCalendar.demo && !editing) {
+    if (calendar.demo && !editing) {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - 9);
       startDate.setHours(0, 0, 0, 0);
@@ -138,23 +137,18 @@ export function CalendarContent({
     } else {
       return [
         new Date(
-          localCalendar.startDate
-            ? localCalendar.startDate + "T00:00:00"
+          calendar.startDate
+            ? calendar.startDate + "T00:00:00"
             : "2020-12-01T00:00:00"
         ),
         new Date(
-          localCalendar.endDate
-            ? localCalendar.endDate + "T00:00:00"
+          calendar.endDate
+            ? calendar.endDate + "T00:00:00"
             : "2020-12-25T00:00:00"
         ),
       ];
     }
-  }, [
-    editing,
-    localCalendar.demo,
-    localCalendar.endDate,
-    localCalendar.startDate,
-  ]);
+  }, [editing, calendar.demo, calendar.endDate, calendar.startDate]);
 
   const days = useMemo(() => {
     const days: Day[] = [];
@@ -176,9 +170,9 @@ export function CalendarContent({
   function openDay(day: Day) {
     if (editing || day.available) {
       setOpenFileName(
-        localCalendar.author +
+        calendar.author +
           "/calendars/" +
-          localCalendar.id +
+          calendar.id +
           "/" +
           day.index +
           ".html"

@@ -1,12 +1,7 @@
 import { TopBar } from "@/app/components/top-bar";
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
-import SettingsIcon from "@mui/icons-material/Settings";
-import Tooltip from "@mui/material/Tooltip";
-import { Button } from "../../components/button";
-import { CalendarContent } from "../../components/calendar-content";
 import { Calendar } from "../../entities";
-import DeleteCalendar from "./delete";
-import { ShareButton } from "./share";
+import CalendarEdit from "./calendar-edit";
 
 export default async function CalendarPage({
   params,
@@ -38,23 +33,7 @@ export default async function CalendarPage({
       ) : calendar.author !== user.uid ? (
         <p>Vous n&apos;avez pas accès à ce calendrier.</p>
       ) : (
-        <>
-          <h1 className="flex flex-wrap justify-between">
-            <div className="text-3xl">{calendar.name}</div>
-            <div className="flex">
-              <ShareButton calendar={calendar} />
-              <Tooltip title="Options" className="ml-2">
-                <div>
-                  <Button theme="dark">
-                    <SettingsIcon />
-                  </Button>
-                </div>
-              </Tooltip>
-            </div>
-          </h1>
-          <CalendarContent calendar={calendar} editing />
-          <DeleteCalendar calendar={calendar} />
-        </>
+        <CalendarEdit calendar={calendar} />
       )}
     </>
   );
