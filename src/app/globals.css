@@ -19,3 +19,7 @@ body {
 a {
   text-decoration: inherit;
 }
+
+.ql-editor img {
+  display: inline-block;
+}
