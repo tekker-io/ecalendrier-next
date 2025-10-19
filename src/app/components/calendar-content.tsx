@@ -40,6 +40,12 @@ function DayDialog({
   const { premium } = useAuth();
 
   useEffect(() => {
+    if (!editing) {
+      sendEvent("Open day");
+    }
+  }, [editing]);
+
+  useEffect(() => {
     setLoading(true);
     getFile(fileName)
       .then((fileContent) => {
