@@ -65,6 +65,7 @@ export function AuthProvider({
 
   async function handleSignOut() {
     try {
+      sendEvent("Logout");
       await clearServerSession();
       router.refresh();
     } catch (e) {

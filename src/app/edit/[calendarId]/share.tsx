@@ -2,6 +2,7 @@
 
 import { Button } from "@/app/components/button";
 import { Calendar } from "@/app/entities";
+import { sendEvent } from "@/lib/firebaseClient";
 import LinkIcon from "@mui/icons-material/Link";
 import ShareIcon from "@mui/icons-material/Share";
 import Dialog from "@mui/material/Dialog";
@@ -103,7 +104,13 @@ export function ShareButton({ calendar }: { calendar: Calendar }) {
 
       <Tooltip title="Partager">
         <div>
-          <Button theme="success" onClick={() => setDialogOpen(true)}>
+          <Button
+            theme="success"
+            onClick={() => {
+              sendEvent("Open share");
+              setDialogOpen(true);
+            }}
+          >
             Partager
             <ShareIcon className="ml-1" />
           </Button>

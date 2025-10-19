@@ -3,7 +3,7 @@
 import { Button } from "@/app/components/button";
 import { Spinner } from "@/app/components/spinner";
 import { Calendar } from "@/app/entities";
-import { getFirebaseFirestore } from "@/lib/firebaseClient";
+import { getFirebaseFirestore, sendEvent } from "@/lib/firebaseClient";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Dialog, DialogContent } from "@mui/material";
 import { deleteDoc, doc } from "firebase/firestore";
@@ -23,6 +23,7 @@ function DeleteDialog({
   function deleteCalendar() {
     if (deleting) return;
     setDeleting(true);
+    sendEvent("Delete calendar");
     const firestore = getFirebaseFirestore();
     deleteDoc(doc(firestore, `/calendars/${calendar.id}`)).then(() => {
       router.push("/calendars");

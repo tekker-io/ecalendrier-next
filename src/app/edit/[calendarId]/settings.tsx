@@ -4,7 +4,7 @@ import { Button } from "@/app/components/button";
 import { Spinner } from "@/app/components/spinner";
 import { Calendar } from "@/app/entities";
 import { useAuth } from "@/context/AuthProvider";
-import { getFirebaseFirestore } from "@/lib/firebaseClient";
+import { getFirebaseFirestore, sendEvent } from "@/lib/firebaseClient";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Dialog, DialogContent, Switch } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
@@ -29,6 +29,7 @@ function SettingsDialog({
 
   function save() {
     if (saving) return;
+    sendEvent("Save settings");
     setSaving(true);
     const firestore = getFirebaseFirestore();
     const calendarRef = doc(firestore, "calendars/" + calendar.id);
@@ -152,7 +153,13 @@ export function SettingsButton({
 
       <Tooltip title="Options" className="ml-2">
         <div>
-          <Button theme="dark" onClick={() => setDialogOpen(true)}>
+          <Button
+            theme="dark"
+            onClick={() => {
+              sendEvent("Open settings");
+              setDialogOpen(true);
+            }}
+          >
             <SettingsIcon />
           </Button>
         </div>

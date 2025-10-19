@@ -40,12 +40,6 @@ function DayDialog({
   const { premium } = useAuth();
 
   useEffect(() => {
-    if (!editing) {
-      sendEvent("Open day");
-    }
-  }, [editing]);
-
-  useEffect(() => {
     setLoading(true);
     getFile(fileName)
       .then((fileContent) => {
@@ -174,6 +168,9 @@ export function CalendarContent({
   }, [endDate, startDate]);
 
   function openDay(day: Day) {
+    if (editing) {
+      sendEvent("Open day");
+    }
     if (editing || day.available) {
       setOpenFileName(
         calendar.author +

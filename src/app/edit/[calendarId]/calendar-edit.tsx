@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { sendEvent } from "@/lib/firebaseClient";
+import { useEffect, useState } from "react";
 import { CalendarContent } from "../../components/calendar-content";
 import { Calendar } from "../../entities";
 import DeleteCalendar from "./delete";
@@ -9,6 +10,11 @@ import { ShareButton } from "./share";
 
 export default function CalendarEdit({ calendar }: { calendar: Calendar }) {
   const [localCalendar, setLocalCalendar] = useState(calendar);
+
+  useEffect(() => {
+    sendEvent("Edit calendar");
+  }, []);
+
   return (
     <>
       <h1 className="flex flex-wrap justify-between">
