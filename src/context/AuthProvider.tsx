@@ -4,6 +4,7 @@ import {
   clearServerSession,
   createServerSession,
   getFirebaseAuth,
+  sendEvent,
   signInWithGoogle,
   signOut,
 } from "@/lib/firebaseClient";
@@ -48,6 +49,8 @@ export function AuthProvider({
   }, []);
 
   async function handleSignIn() {
+    sendEvent("Login");
+    sendEvent("Login via Google");
     const res = await signInWithGoogle();
     // Exchange the ID token for a secure server-side session cookie
     try {
