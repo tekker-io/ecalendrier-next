@@ -4,6 +4,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import Link from "next/link";
+import { ScreenTracker } from "./components/screen-tracker";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -37,6 +38,7 @@ export default async function RootLayout({
       <body
         className={`m-0 bg-cover min-h-full bg-center bg-fixed pt-12 relative`}
       >
+        <ScreenTracker />
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <div className="w-4/5 max-w-7xl m-auto pb-16">
             <div

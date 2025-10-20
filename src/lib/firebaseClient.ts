@@ -73,10 +73,10 @@ export function getFirebaseFirestore() {
   return getFirestore();
 }
 
-export function sendEvent(name: string) {
+export function sendEvent(name: string, params?: { [key: string]: string }) {
   initFirebase();
   const analytics = getAnalytics();
-  logEvent(analytics, name);
+  logEvent(analytics, name, params);
 }
 
 export const googleProvider = new GoogleAuthProvider();
