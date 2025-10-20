@@ -78,7 +78,7 @@ export default async function CalendarPage({
               </i>
             </p>
           )}
-          <CalendarContent calendar={calendar} />
+          <CalendarContent calendar={calendar} premium={false} />
         </>
       )}
     </>

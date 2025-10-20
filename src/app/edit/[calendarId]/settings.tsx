@@ -3,7 +3,6 @@
 import { Button } from "@/app/components/button";
 import { Spinner } from "@/app/components/spinner";
 import { Calendar } from "@/app/entities";
-import { useAuth } from "@/context/AuthProvider";
 import { getFirebaseFirestore, sendEvent } from "@/lib/firebaseClient";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Dialog, DialogContent, Switch } from "@mui/material";
@@ -15,11 +14,12 @@ import { useState } from "react";
 function SettingsDialog({
   calendar,
   onClose,
+  premium,
 }: {
   calendar: Calendar;
   onClose: (newValues?: Partial<Calendar>) => void;
+  premium: boolean;
 }) {
-  const { premium } = useAuth();
   const [name, setName] = useState(calendar.name);
   const [startDate, setStartDate] = useState(calendar.startDate);
   const [endDate, setEndDate] = useState(calendar.endDate);
@@ -131,9 +131,11 @@ function SettingsDialog({
 export function SettingsButton({
   calendar,
   setLocalCalendar,
+  premium,
 }: {
   calendar: Calendar;
   setLocalCalendar: (value: Calendar) => void;
+  premium: boolean;
 }) {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
@@ -141,6 +143,7 @@ export function SettingsButton({
     <>
       {dialogOpen && (
         <SettingsDialog
+          premium={premium}
           calendar={calendar}
           onClose={(newValues) => {
             setDialogOpen(false);

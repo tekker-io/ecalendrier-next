@@ -1,10 +1,14 @@
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import StarIcon from "@mui/icons-material/Star";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { TopBar } from "../components/top-bar";
 
 export default async function PremiumPage() {
   const user = await getUserFromCookie();
+  if (!user) {
+    redirect("/");
+  }
 
   // Query Firestore for calendars authored by this uid
   const db = admin.firestore();

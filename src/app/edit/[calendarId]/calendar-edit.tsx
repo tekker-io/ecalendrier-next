@@ -8,7 +8,13 @@ import DeleteCalendar from "./delete";
 import { SettingsButton } from "./settings";
 import { ShareButton } from "./share";
 
-export default function CalendarEdit({ calendar }: { calendar: Calendar }) {
+export default function CalendarEdit({
+  calendar,
+  premium,
+}: {
+  calendar: Calendar;
+  premium: boolean;
+}) {
   const [localCalendar, setLocalCalendar] = useState(calendar);
 
   useEffect(() => {
@@ -22,12 +28,13 @@ export default function CalendarEdit({ calendar }: { calendar: Calendar }) {
         <div className="flex">
           <ShareButton calendar={localCalendar} />
           <SettingsButton
+            premium={premium}
             calendar={localCalendar}
             setLocalCalendar={setLocalCalendar}
           />
         </div>
       </h1>
-      <CalendarContent calendar={localCalendar} editing />
+      <CalendarContent calendar={localCalendar} premium={premium} editing />
       <DeleteCalendar calendar={localCalendar} />
     </>
   );

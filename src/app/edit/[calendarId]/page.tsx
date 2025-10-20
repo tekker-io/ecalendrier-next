@@ -1,5 +1,6 @@
 import { TopBar } from "@/app/components/top-bar";
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
+import { redirect } from "next/navigation";
 import { Calendar } from "../../entities";
 import CalendarEdit from "./calendar-edit";
 
@@ -10,14 +11,23 @@ export default async function CalendarPage({
 }) {
   const beforeGetUserFromCookie = Date.now();
   const user = await getUserFromCookie();
+  if (!user) {
+    redirect("/");
+  }
   console.log(
     `getUserFromCookie took ${Date.now() - beforeGetUserFromCookie}ms`
   );
+  const db = admin.firestore();
+
+  const beforeDbFetchUser = Date.now();
+  const snap = await db.doc(`users/${user.uid}`).get();
+  const premium = snap.get("premium");
+  console.log(`DB fetch user took ${Date.now() - beforeDbFetchUser}ms`);
+
   const beforeGetParams = Date.now();
   const { calendarId } = await params;
   console.log(`Getting params took ${Date.now() - beforeGetParams}ms`);
   const beforeDbFetch = Date.now();
-  const db = admin.firestore();
   const doc = await db.collection("calendars").doc(calendarId).get();
   console.log(`DB fetch took ${Date.now() - beforeDbFetch}ms`);
   const calendar: Calendar | undefined = !doc.exists
@@ -41,7 +51,7 @@ export default async function CalendarPage({
       ) : calendar.author !== user.uid ? (
         <p>Vous n&apos;avez pas accès à ce calendrier.</p>
       ) : (
-        <CalendarEdit calendar={calendar} />
+        <CalendarEdit calendar={calendar} premium={premium} />
       )}
     </>
   );

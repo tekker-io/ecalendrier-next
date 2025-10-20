@@ -1,4 +1,5 @@
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
+import { redirect } from "next/navigation";
 import { LogoutButton } from "../components/logout-button";
 import { TopBar } from "../components/top-bar";
 import { Calendars } from "./calendars";
@@ -10,6 +11,9 @@ export type CalendarList = {
 
 export default async function CalendarsPage() {
   const user = await getUserFromCookie();
+  if (!user) {
+    redirect("/");
+  }
 
   const db = admin.firestore();
   const snap = await db

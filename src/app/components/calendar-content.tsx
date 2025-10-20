@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/context/AuthProvider";
 import { getFile, sendEvent, writeFile } from "@/lib/firebaseClient";
 import EditIcon from "@mui/icons-material/Edit";
 import Dialog from "@mui/material/Dialog";
@@ -27,17 +26,18 @@ function DayDialog({
   onClose,
   fileName,
   editing,
+  premium,
 }: {
   onClose: () => void;
   fileName: string;
   editing: boolean;
+  premium: boolean;
 }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
   const [fileContent, setFileContent] = useState<string>("");
   const quillRef = useRef<HTMLDivElement>(null);
-  const { premium } = useAuth();
 
   useEffect(() => {
     setLoading(true);
@@ -120,9 +120,11 @@ function DayDialog({
 export function CalendarContent({
   editing = false,
   calendar,
+  premium,
 }: {
   editing?: boolean;
   calendar: Calendar;
+  premium: boolean;
 }) {
   const [openFileName, setOpenFileName] = useState<string | null>(null);
 
@@ -190,6 +192,7 @@ export function CalendarContent({
           onClose={() => setOpenFileName(null)}
           fileName={openFileName}
           editing={editing}
+          premium={premium}
         />
       )}
       {days.map((day) => (

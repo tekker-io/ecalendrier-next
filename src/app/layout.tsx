@@ -1,5 +1,4 @@
 import { AuthProvider } from "@/context/AuthProvider";
-import admin, { checkIsLoggedIn, getUserFromCookie } from "@/lib/firebaseAdmin";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
@@ -9,7 +8,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "eCalendrier - Calendrier de l'avent en ligne",
-  description: "eCalendrier",
+  description: "Créez gratuitement votre calendrier de l'avent en ligne !",
   openGraph: {
     images: "/bg.webp",
   },
@@ -24,15 +23,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let premium = false;
-
-  if (await checkIsLoggedIn()) {
-    const user = await getUserFromCookie();
-    const db = admin.firestore();
-    const snap = await db.doc(`users/${user.uid}`).get();
-    premium = snap.get("premium");
-  }
-
   return (
     <html lang="fr" className={`h-full ${roboto.className}`}>
       <body
@@ -48,7 +38,7 @@ export default async function RootLayout({
                   "linear-gradient(104.42deg, rgba(100, 150, 101, 0.4) 0.83%, rgba(240, 0, 35, 0.4) 98.12%)",
               }}
             >
-              <AuthProvider premium={premium}>{children}</AuthProvider>
+              <AuthProvider>{children}</AuthProvider>
             </div>
           </div>
           <div className="absolute bottom-0 bg-black w-full">

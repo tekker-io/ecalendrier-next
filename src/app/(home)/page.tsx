@@ -1,12 +1,15 @@
-"use client";
-
-import { useAuth } from "@/context/AuthProvider";
+import { getUserFromCookie } from "@/lib/firebaseAdmin";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { SocialButton } from "../components/social-button";
+import { GoogleButton } from "./google-button";
 
-export default function Home() {
-  const { signInWithGoogle } = useAuth();
+export default async function Home() {
+  const user = await getUserFromCookie();
+  if (user) {
+    redirect("/calendars");
+  }
 
   return (
     <main className="flex">
@@ -16,14 +19,7 @@ export default function Home() {
           Créez gratuitement votre calendrier de l&apos;avent
         </h2>
         <div className="flex flex-wrap">
-          <SocialButton
-            onClick={() => signInWithGoogle()}
-            theme="blue"
-            img="/google.svg"
-            imgAlt="Google logo"
-          >
-            Connexion avec Google
-          </SocialButton>
+          <GoogleButton />
         </div>
         <div className="w-20 h-0.5 bg-black my-7" />
         <Link href="-MMm0AnXznQF1ZTaetrC">
