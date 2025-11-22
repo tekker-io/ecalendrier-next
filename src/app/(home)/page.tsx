@@ -12,10 +12,10 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex">
-      <div className="flex-1">
+    <main className="flex sm:flex-row flex-col sm:gap-0 gap-10">
+      <div className="flex-1 flex flex-col items-center sm:items-start">
         <Image src="/logo.svg" alt="logo" width="212" height="59" />
-        <h2 className="text-white font-bold text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl mt-12 mb-10">
+        <h2 className="text-white font-bold text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl mt-12 mb-10 text-center sm:text-left">
           Créez gratuitement votre calendrier de l&apos;avent
         </h2>
         <div className="flex flex-wrap">
@@ -32,7 +32,7 @@ export default async function Home() {
           </SocialButton>
         </Link>
       </div>
-      <div className="flex-1 invisible md:visible flex">
+      <div className="flex-1 flex">
         <Image
           src="/santa.svg"
           alt="santa"
