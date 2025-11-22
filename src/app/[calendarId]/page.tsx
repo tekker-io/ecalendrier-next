@@ -49,7 +49,7 @@ export default async function CalendarPage({
   return (
     <>
       {(!calendar || calendar.displayLogo || calendar.displayCta) && (
-        <div className="mb-14 flex justify-between items-center flex-col md:flex-row">
+        <div className="mb-10 sm:mb-14 flex justify-between items-center flex-col md:flex-row">
           <Link href="/">
             {(!calendar || calendar.displayLogo) && (
               <Image src="/logo.svg" alt="logo" width="212" height="59" />

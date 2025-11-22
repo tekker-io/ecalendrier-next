@@ -30,19 +30,21 @@ export default async function RootLayout({
       >
         <ScreenTracker />
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <div className="w-4/5 max-w-7xl m-auto pb-16">
-            <div
-              className="backdrop-blur-lg rounded-lg p-6 lg:p-12"
-              style={{
-                background:
-                  "linear-gradient(104.42deg, rgba(100, 150, 101, 0.4) 0.83%, rgba(240, 0, 35, 0.4) 98.12%)",
-              }}
-            >
-              <AuthProvider>{children}</AuthProvider>
+          <div className="px-6 sm:px-12 md:px-16 lg:px-24">
+            <div className="max-w-7xl m-auto pb-16">
+              <div
+                className="backdrop-blur-lg rounded-lg py-6 lg:py-12 px-4 sm:px-6 lg:px-12"
+                style={{
+                  background:
+                    "linear-gradient(104.42deg, rgba(100, 150, 101, 0.4) 0.83%, rgba(240, 0, 35, 0.4) 98.12%)",
+                }}
+              >
+                <AuthProvider>{children}</AuthProvider>
+              </div>
             </div>
           </div>
           <div className="absolute bottom-0 bg-black w-full">
-            <div className="w-4/5 max-w-7xl m-auto">
+            <div className="max-w-7xl m-auto">
               <Link href="/privacy">Politique de confidentialité</Link>
             </div>
           </div>

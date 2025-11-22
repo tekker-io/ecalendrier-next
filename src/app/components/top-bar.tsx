@@ -10,7 +10,7 @@ import { Button } from "./button";
 
 export function TopBar() {
   return (
-    <div className="mb-14 flex justify-between items-center flex-col md:flex-row">
+    <div className="mb-10 sm:mb-14 flex justify-between items-center flex-col md:flex-row">
       <Link href="/calendars">
         <Image src="/logo.svg" alt="logo" width="212" height="59" />
       </Link>
