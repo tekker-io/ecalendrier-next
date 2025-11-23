@@ -135,8 +135,14 @@ function SettingsDialog({
               <Link href="/premium" target="_blank" className="!underline">
                 mode premium
               </Link>
-              , vous pouvez aussi mélanger les jours, cacher le logo du site et
-              cacher le bouton &quot;Créer mon propre calendrier&quot;
+              , vous pouvez aussi :
+              <ul className="list-disc list-inside">
+                <li>Mélanger les jours (nouveau !)</li>
+                <li>Cacher le logo du site</li>
+                <li>
+                  Cacher le bouton &quot;Créer mon propre calendrier&quot;
+                </li>
+              </ul>
             </i>
           </div>
         )}
