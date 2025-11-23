@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       sendEvent("Logout");
       await clearServerSession();
       router.refresh();
-    } catch (e) {
+    } catch {
       // ignore
     }
     await signOut();
