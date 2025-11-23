@@ -3,6 +3,7 @@ export type Calendar = {
   name: string;
   displayLogo: boolean;
   displayCta: boolean;
+  randomized: number;
   demo: boolean;
   startDate: string;
   endDate: string;

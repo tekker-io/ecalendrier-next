@@ -38,9 +38,10 @@ export default async function PremiumPage() {
             Désactiver le bouton &quot;Créer mon propre calendrier&quot; sur vos
             calendriers
           </li>
+          <li>Mélanger les jours de votre calendrier</li>
           <li>Retirer la limite de 2Mo par case</li>
         </ul>
-        <p>
+        <p className="mt-2">
           Acheter le mode premium permet aussi de soutenir le développement de
           l&apos;application pour qu&apos;il puisse perdurer dans le temps.
         </p>

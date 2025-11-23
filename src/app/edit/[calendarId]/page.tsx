@@ -37,6 +37,7 @@ export default async function CalendarPage({
         name: doc.get("name"),
         displayLogo: doc.get("displayLogo") ?? true,
         displayCta: doc.get("displayCta") ?? true,
+        randomized: doc.get("randomized") ?? 0,
         demo: doc.get("demo") || false,
         startDate: doc.get("startDate"),
         endDate: doc.get("endDate"),

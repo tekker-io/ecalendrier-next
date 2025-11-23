@@ -1,6 +1,7 @@
 "use client";
 
 import { getFile, sendEvent, writeFile } from "@/lib/firebaseClient";
+import { shuffle } from "@/lib/random";
 import EditIcon from "@mui/icons-material/Edit";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -169,6 +170,17 @@ export function CalendarContent({
     return days;
   }, [endDate, startDate]);
 
+  const randomizedDays = useMemo(() => {
+    if (calendar.randomized > 0) {
+      // Use calendar ID as seed for consistent shuffling
+      const seed = calendar.randomized;
+      // Create a copy of days to avoid mutating the original array
+      return shuffle([...days], seed);
+    } else {
+      return days;
+    }
+  }, [days, calendar.randomized]);
+
   function openDay(day: Day) {
     if (editing) {
       sendEvent("Open day");
@@ -195,7 +207,7 @@ export function CalendarContent({
           premium={premium}
         />
       )}
-      {days.map((day) => (
+      {randomizedDays.map((day) => (
         <Tooltip
           placement="top"
           title={

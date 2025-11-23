@@ -25,6 +25,7 @@ function SettingsDialog({
   const [endDate, setEndDate] = useState(calendar.endDate);
   const [displayLogo, setDisplayLogo] = useState(calendar.displayLogo);
   const [displayCta, setDisplayCta] = useState(calendar.displayCta);
+  const [randomized, setRandomized] = useState(calendar.randomized);
   const [saving, setSaving] = useState(false);
 
   function save() {
@@ -39,6 +40,7 @@ function SettingsDialog({
       endDate,
       displayLogo: displayLogo,
       displayCta: displayCta,
+      randomized: randomized,
     };
     updateDoc(calendarRef, newValues).then(() => {
       onClose(newValues);
@@ -106,6 +108,26 @@ function SettingsDialog({
             />
           </label>
         )}
+        {premium && (
+          <div>
+            <label className="flex justify-between items-center">
+              <div className="pb-3 pt-3">
+                <h3 className="text-lg font-bold">Mélanger les jours</h3>
+                <i>
+                  L&apos;ordre ne change que quand vous activez l&apos;option.
+                </i>
+              </div>
+              <Switch
+                checked={randomized > 0}
+                onChange={(e) =>
+                  setRandomized(
+                    e.target.checked ? Math.ceil(Math.random() * 100) : 0
+                  )
+                }
+              />
+            </label>
+          </div>
+        )}
         {!premium && (
           <div className="pt-4">
             <i>
@@ -113,8 +135,8 @@ function SettingsDialog({
               <Link href="/premium" target="_blank" className="!underline">
                 mode premium
               </Link>
-              , vous pouvez aussi cacher le logo du site et le bouton
-              &quot;Créer mon propre calendrier&quot;
+              , vous pouvez aussi mélanger les jours, cacher le logo du site et
+              cacher le bouton &quot;Créer mon propre calendrier&quot;
             </i>
           </div>
         )}
