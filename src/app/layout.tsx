@@ -1,5 +1,5 @@
 import { AuthProvider } from "@/context/AuthProvider";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import Link from "next/link";
