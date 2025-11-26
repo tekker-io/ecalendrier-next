@@ -29,3 +29,7 @@ a {
 .ql-editor object {
   display: inline-block !important;
 }
+
+.ql-editor img {
+  max-height: 80vh;
+}
