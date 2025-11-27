@@ -41,6 +41,7 @@ export default function Editor({
     const quill = new Quill(editorContainer, {
       theme: "snow",
       placeholder: "Écrivez quelque chose...",
+      bounds: ".MuiDialogContent-root",
       modules: {
         toolbar: [
           ["bold", "italic", "underline", "strike"],

@@ -20,6 +20,10 @@ a {
   text-decoration: inherit;
 }
 
+.ql-editor {
+  min-height: 100px;
+}
+
 .ql-editor img,
 .ql-editor svg,
 .ql-editor video,
@@ -32,4 +36,16 @@ a {
 
 .ql-editor img {
   max-height: 80vh;
+}
+
+/*
+** Quill translations (urgh...) https://github.com/slab/quill/issues/2339
+*/
+
+.ql-snow .ql-tooltip[data-mode="link"]::before {
+  content: "Entrez le lien";
+}
+
+.ql-snow .ql-tooltip.ql-editing a.ql-action::after {
+  content: "Valider";
 }
