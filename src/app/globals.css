@@ -20,10 +20,6 @@ a {
   text-decoration: inherit;
 }
 
-.ql-editor {
-  min-height: 100px;
-}
-
 .ql-editor img,
 .ql-editor svg,
 .ql-editor video,
