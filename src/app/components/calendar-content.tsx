@@ -241,7 +241,7 @@ export function CalendarContent({
                 width={100}
                 height={100}
                 className={`mb-4 mt-0 sm:mb-0 sm:mt-6 w-[50px] md:w-[130px] ${
-                  day.available && "grayscale"
+                  !day.available && "grayscale"
                 }`}
               />
             ) : (
