@@ -234,13 +234,25 @@ export function CalendarContent({
                 {day.date}
               </span>
             </div>
-            <Image
-              alt="Cadeau"
-              className="mb-4 mt-0 sm:mb-0 sm:mt-4 w-[50px] md:w-[130px]"
-              src={day.available ? "/gift.svg" : "/gift-disabled.svg"}
-              width="130"
-              height={day.available ? 111 : 115}
-            />
+            {calendar.dayImage ? (
+              <Image
+                src={calendar.dayImage}
+                alt="Image du jour"
+                width={100}
+                height={100}
+                className={`mb-4 mt-0 sm:mb-0 sm:mt-6 w-[50px] md:w-[130px] ${
+                  day.available && "grayscale"
+                }`}
+              />
+            ) : (
+              <Image
+                alt="Cadeau"
+                className="mb-4 mt-0 sm:mb-0 sm:mt-4 w-[50px] md:w-[130px]"
+                src={day.available ? "/gift.svg" : "/gift-disabled.svg"}
+                width="130"
+                height={day.available ? 111 : 115}
+              />
+            )}
           </div>
         </Tooltip>
       ))}

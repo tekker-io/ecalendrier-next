@@ -38,9 +38,8 @@ export default async function PremiumPage() {
             Désactiver le bouton &quot;Créer mon propre calendrier&quot; sur vos
             calendriers
           </li>
-          <li className="relative">
-            Mélanger les jours de votre calendrier (Nouveau !)
-          </li>
+          <li>Mélanger les jours de votre calendrier (Nouveau !)</li>
+          <li>Changer l&apos;image des cadeaux (Nouveau !)</li>
           <li>Retirer la limite de 2Mo par case</li>
         </ul>
         <p className="mt-2">

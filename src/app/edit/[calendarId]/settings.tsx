@@ -4,20 +4,26 @@ import { Button } from "@/app/components/button";
 import { Spinner } from "@/app/components/spinner";
 import { Calendar } from "@/app/entities";
 import { getFirebaseFirestore, sendEvent } from "@/lib/firebaseClient";
+import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsIcon from "@mui/icons-material/Settings";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { Dialog, DialogContent, Switch } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import { doc, updateDoc } from "firebase/firestore";
+import NextImage from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 function SettingsDialog({
   calendar,
   onClose,
+  onUpdate,
   premium,
 }: {
   calendar: Calendar;
-  onClose: (newValues?: Partial<Calendar>) => void;
+  onClose: () => void;
+  onUpdate: (newValues: Partial<Calendar>) => void;
   premium: boolean;
 }) {
   const [name, setName] = useState(calendar.name);
@@ -43,7 +49,70 @@ function SettingsDialog({
       randomized: randomized,
     };
     updateDoc(calendarRef, newValues).then(() => {
-      onClose(newValues);
+      onUpdate(newValues);
+      onClose();
+    });
+  }
+
+  function uploadDayImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    sendEvent("Upload day image");
+    const reader = new FileReader();
+    reader.onload = function (upload) {
+      if (!upload.target?.result) {
+        toast.error("Erreur lors de l'upload de l'image.");
+        return;
+      }
+      const image = new Image();
+      //Set the Base64 string return from FileReader as source.
+      image.src = upload.target.result as string;
+
+      console.log(upload);
+
+      image.onload = function () {
+        let imgValue = upload.target?.result as string;
+
+        if (image.height > 200 || image.width > 200) {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (image.height > image.width) {
+            canvas.height = 200;
+            canvas.width = (image.width / image.height) * 200;
+          } else {
+            canvas.width = 200;
+            canvas.height = (image.height / image.width) * 200;
+          }
+          if (!ctx) {
+            toast.error("Erreur lors de l'upload de l'image.");
+            return;
+          }
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          toast.error("L'image dépasse les 200px et a donc été redimensionnée");
+          imgValue = canvas.toDataURL("image/png");
+        }
+        const firestore = getFirebaseFirestore();
+        const calendarRef = doc(firestore, "calendars/" + calendar.id);
+        const newValues = {
+          dayImage: imgValue,
+        };
+        updateDoc(calendarRef, newValues).then(() => {
+          onUpdate(newValues);
+        });
+      };
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function deleteImage() {
+    sendEvent("Delete day image");
+    const firestore = getFirebaseFirestore();
+    const calendarRef = doc(firestore, "calendars/" + calendar.id);
+    const newValues = {
+      dayImage: null,
+    };
+    updateDoc(calendarRef, newValues).then(() => {
+      onUpdate(newValues);
     });
   }
 
@@ -86,6 +155,45 @@ function SettingsDialog({
             />
           </div>
         </label>
+        {premium && (
+          <label className="flex justify-between items-center">
+            <h3 className="text-lg pb-3 pt-3 font-bold">
+              Modifier l&apos;image des cases
+            </h3>
+            {calendar.dayImage ? (
+              <div className="relative">
+                <div className="absolute left-0 top-0 size-full cursor-pointer flex items-center justify-center hover:bg-black/30 rounded-sm group">
+                  <div
+                    className="group-hover:block hidden"
+                    onClick={deleteImage}
+                  >
+                    <Button>
+                      <DeleteIcon className="text-2xl" />
+                    </Button>
+                  </div>
+                </div>
+                <NextImage
+                  src={calendar.dayImage}
+                  alt="Image du jour"
+                  width={100}
+                  height={100}
+                />
+              </div>
+            ) : (
+              <Button>
+                <label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => uploadDayImage(e)}
+                  />
+                  <UploadFileIcon className="cursor-pointer" />
+                </label>
+              </Button>
+            )}
+          </label>
+        )}
         {premium && (
           <label className="flex justify-between items-center">
             <h3 className="text-lg pb-3 pt-3 font-bold">
@@ -138,6 +246,7 @@ function SettingsDialog({
               , vous pouvez aussi :
               <ul className="list-disc list-inside">
                 <li>Mélanger les jours (nouveau !)</li>
+                <li>Changer l&apos;image des cadeaux (nouveau !)</li>
                 <li>Cacher le logo du site</li>
                 <li>
                   Cacher le bouton &quot;Créer mon propre calendrier&quot;
@@ -173,8 +282,10 @@ export function SettingsButton({
         <SettingsDialog
           premium={premium}
           calendar={calendar}
-          onClose={(newValues) => {
+          onClose={() => {
             setDialogOpen(false);
+          }}
+          onUpdate={(newValues) => {
             if (newValues) {
               setLocalCalendar({ ...calendar, ...newValues } as Calendar);
             }

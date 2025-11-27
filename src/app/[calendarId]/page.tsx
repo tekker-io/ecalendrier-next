@@ -45,6 +45,7 @@ export default async function CalendarPage({
         startDate: doc.get("startDate"),
         endDate: doc.get("endDate"),
         author: doc.get("author"),
+        dayImage: doc.get("dayImage") || null,
       };
 
   return (

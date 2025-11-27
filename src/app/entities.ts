@@ -8,4 +8,5 @@ export type Calendar = {
   startDate: string;
   endDate: string;
   author: string;
+  dayImage: string | null;
 };

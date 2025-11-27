@@ -3,6 +3,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import Link from "next/link";
+import { Toaster } from "react-hot-toast";
 import { ScreenTracker } from "./components/screen-tracker";
 import "./globals.css";
 
@@ -28,6 +29,7 @@ export default async function RootLayout({
       <body
         className={`m-0 bg-cover min-h-full bg-center bg-fixed pt-12 relative`}
       >
+        <Toaster position="top-right" />
         <ScreenTracker />
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <div className="px-6 sm:px-12 md:px-16 lg:px-24">
