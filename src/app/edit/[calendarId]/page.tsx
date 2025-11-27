@@ -1,3 +1,4 @@
+import { BlackFridayDisplayer } from "@/app/components/black-friday-displayer";
 import { TopBar } from "@/app/components/top-bar";
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import { redirect } from "next/navigation";
@@ -47,6 +48,7 @@ export default async function CalendarPage({
 
   return (
     <>
+      <BlackFridayDisplayer premium={premium} />
       <TopBar />
       {!calendar ? (
         <p>Ce lien est invalide</p>

@@ -20,6 +20,10 @@ a {
   text-decoration: inherit;
 }
 
+.display-black-friday #black-friday-banner {
+  display: block;
+}
+
 .ql-editor img,
 .ql-editor svg,
 .ql-editor video,

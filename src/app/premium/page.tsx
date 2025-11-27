@@ -2,6 +2,7 @@ import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import StarIcon from "@mui/icons-material/Star";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { BlackFridayDisplayer } from "../components/black-friday-displayer";
 import { TopBar } from "../components/top-bar";
 
 export default async function PremiumPage() {
@@ -19,6 +20,7 @@ export default async function PremiumPage() {
 
   return (
     <>
+      <BlackFridayDisplayer premium={premium} />
       <TopBar />
       <h1 className="text-5xl mb-4 text-yellow-100 flex items-center justify-center">
         <StarIcon />
