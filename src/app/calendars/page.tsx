@@ -1,6 +1,5 @@
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import { redirect } from "next/navigation";
-import { BlackFridayDisplayer } from "../components/black-friday-displayer";
 import { LogoutButton } from "../components/logout-button";
 import { TopBar } from "../components/top-bar";
 import { Calendars } from "./calendars";
@@ -18,9 +17,6 @@ export default async function CalendarsPage() {
 
   const db = admin.firestore();
 
-  const userSnap = await db.doc(`users/${user.uid}`).get();
-  const premium = userSnap.get("premium");
-
   const snap = await db
     .collection("calendars")
     .where("author", "==", user.uid)
@@ -33,7 +29,6 @@ export default async function CalendarsPage() {
 
   return (
     <>
-      <BlackFridayDisplayer premium={premium} />
       <TopBar />
       <h1 className="text-4xl mb-4">Bonjour !</h1>
       <h2 className="text-2xl mb-3">Mes calendriers :</h2>

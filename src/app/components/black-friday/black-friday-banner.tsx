@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+/*
+ ** To use this, enable it in layout.tsx
+ ** Then add some <BlackFridayDisplayer premium={premium} /> at the root of the pages that needs to display it
+ */
+
 export function BlackFridayBanner() {
   return (
     <Link
