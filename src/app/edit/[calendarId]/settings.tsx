@@ -3,7 +3,13 @@
 import { Button } from "@/app/components/button";
 import { Spinner } from "@/app/components/spinner";
 import { Calendar } from "@/app/entities";
-import { getFirebaseFirestore, sendEvent } from "@/lib/firebaseClient";
+import {
+  deleteFile,
+  getFirebaseFirestore,
+  getMediaURL,
+  sendEvent,
+  writeFileBytes,
+} from "@/lib/firebaseClient";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
@@ -13,7 +19,6 @@ import { doc, updateDoc } from "firebase/firestore";
 import NextImage from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import toast from "react-hot-toast";
 
 function SettingsDialog({
   calendar,
@@ -33,6 +38,9 @@ function SettingsDialog({
   const [displayCta, setDisplayCta] = useState(calendar.displayCta);
   const [randomized, setRandomized] = useState(calendar.randomized);
   const [saving, setSaving] = useState(false);
+
+  const dayImageFileName =
+    calendar.author + "/calendars/" + calendar.id + "/dayImage";
 
   function save() {
     if (saving) return;
@@ -58,50 +66,18 @@ function SettingsDialog({
     const file = e.target.files?.[0];
     if (!file) return;
     sendEvent("Upload day image");
-    const reader = new FileReader();
-    reader.onload = function (upload) {
-      if (!upload.target?.result) {
-        toast.error("Erreur lors de l'upload de l'image.");
-        return;
-      }
-      const image = new Image();
-      //Set the Base64 string return from FileReader as source.
-      image.src = upload.target.result as string;
-
-      console.log(upload);
-
-      image.onload = function () {
-        let imgValue = upload.target?.result as string;
-
-        if (image.height > 200 || image.width > 200) {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          if (image.height > image.width) {
-            canvas.height = 200;
-            canvas.width = (image.width / image.height) * 200;
-          } else {
-            canvas.width = 200;
-            canvas.height = (image.height / image.width) * 200;
-          }
-          if (!ctx) {
-            toast.error("Erreur lors de l'upload de l'image.");
-            return;
-          }
-          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-          toast.error("L'image dépasse les 200px et a donc été redimensionnée");
-          imgValue = canvas.toDataURL("image/png");
-        }
-        const firestore = getFirebaseFirestore();
-        const calendarRef = doc(firestore, "calendars/" + calendar.id);
+    writeFileBytes(dayImageFileName, file).then(() => {
+      const firestore = getFirebaseFirestore();
+      const calendarRef = doc(firestore, "calendars/" + calendar.id);
+      getMediaURL(dayImageFileName).then((url) => {
         const newValues = {
-          dayImage: imgValue,
+          dayImage: url + "v=" + Date.now(),
         };
         updateDoc(calendarRef, newValues).then(() => {
           onUpdate(newValues);
         });
-      };
-    };
-    reader.readAsDataURL(file);
+      });
+    });
   }
 
   function deleteImage() {
@@ -111,8 +87,10 @@ function SettingsDialog({
     const newValues = {
       dayImage: null,
     };
-    updateDoc(calendarRef, newValues).then(() => {
-      onUpdate(newValues);
+    deleteFile(dayImageFileName).then(() => {
+      updateDoc(calendarRef, newValues).then(() => {
+        onUpdate(newValues);
+      });
     });
   }
 

@@ -12,9 +12,11 @@ import {
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import {
+  deleteObject,
   getDownloadURL,
   getStorage,
   ref,
+  uploadBytes,
   uploadString,
 } from 'firebase/storage';
 
@@ -53,6 +55,12 @@ export function getFirebaseAuth() {
   return getAuth();
 }
 
+export async function getMediaURL(filename: string) {
+  initFirebase();
+  const storage = getStorage();
+  return (await getDownloadURL(ref(storage, filename))) + '?alt=media';
+}
+
 export async function getFile(filename: string) {
   initFirebase();
   const storage = getStorage();
@@ -61,11 +69,25 @@ export async function getFile(filename: string) {
   return await data.text();
 }
 
+export async function writeFileBytes(filename: string, content: Blob) {
+  initFirebase();
+  const storage = getStorage();
+  const fileRef = ref(storage, filename);
+  await uploadBytes(fileRef, content);
+}
+
 export async function writeFile(filename: string, content: string) {
   initFirebase();
   const storage = getStorage();
   const fileRef = ref(storage, filename);
   await uploadString(fileRef, content);
+}
+
+export async function deleteFile(filename: string) {
+  initFirebase();
+  const storage = getStorage();
+  const fileRef = ref(storage, filename);
+  await deleteObject(fileRef);
 }
 
 export function getFirebaseFirestore() {
