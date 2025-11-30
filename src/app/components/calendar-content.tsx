@@ -85,14 +85,16 @@ function DayDialog({
               />
             )}
             {(!editing || preview) && (
-              <div
-                className="ql-editor"
-                dangerouslySetInnerHTML={{
-                  __html:
-                    fileContent ||
-                    "<i>Le père noël n'est pas encore passé par là...</i>",
-                }}
-              />
+              <div className="ql-snow">
+                <div
+                  className="ql-editor"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      fileContent ||
+                      "<i>Le père noël n'est pas encore passé par là...</i>",
+                  }}
+                />
+              </div>
             )}
             {editing && (
               <div className="mt-4">
