@@ -8,7 +8,7 @@ import { ScreenTracker } from "./components/screen-tracker";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "eCalendrier - Calendrier de l'avent en ligne",
+  title: "Case du jour - Calendrier de l'avent en ligne",
   description: "Créez gratuitement votre calendrier de l'avent en ligne !",
   openGraph: {
     images: "/bg.webp",

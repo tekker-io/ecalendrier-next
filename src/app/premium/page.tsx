@@ -32,7 +32,7 @@ export default async function PremiumPage() {
         </p>
         <ul className="list-disc list-inside">
           <li>
-            Désactiver le logo &quot;eCalendrier&quot; sur vos calendriers
+            Désactiver le logo &quot;Case du jour&quot; sur vos calendriers
           </li>
           <li>
             Désactiver le bouton &quot;Créer mon propre calendrier&quot; sur vos

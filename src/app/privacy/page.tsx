@@ -8,8 +8,8 @@ export default function PrivacyPage() {
       <div>
         <h1 className="text-5xl mb-2">Politique de confidentialité</h1>
         <p className="mb-1">
-          eCalendrier est une application développée par Arnaud Drain dans un
-          but non-commercial.
+          Case du jour est une application développée par Tekker dans un but
+          non-commercial.
         </p>
         <h2 className="text-3xl mb-2">Données récoltées</h2>
         <p className="mb-1">
@@ -19,13 +19,13 @@ export default function PrivacyPage() {
         </p>
         <h2 className="text-3xl mb-2">Traceurs</h2>
         <p className="mb-1">
-          eCalendrier utilise Google Analytics pour récolter des statistiques
+          Case du jour utilise Google Analytics pour récolter des statistiques
           d&apos;utilisation de l&apos;application. Ces statistiques sont
           anonymisés.
         </p>
         <h2 className="text-3xl mb-2">Hébergement des données</h2>
         <p className="mb-1">
-          Les données de eCalendrier sont stockés en Europe par le service
+          Les données de Case du jour sont stockés en Europe par le service
           &quot;Firebase&quot; appartenant à Google (Alphabet).
         </p>
         <h2 className="text-3xl mb-2">Contact et suppression des données</h2>
