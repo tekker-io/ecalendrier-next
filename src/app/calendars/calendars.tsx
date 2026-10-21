@@ -14,8 +14,8 @@ import { Button } from "../components/button";
 import { Spinner } from "../components/spinner";
 import { CalendarList } from "./page";
 
-const christmasStartDate = "2025-12-01";
-const christmasEndDate = "2025-12-25";
+const christmasStartDate = "2026-12-01";
+const christmasEndDate = "2026-12-25";
 
 function AddCalendarDialog({
   open,
@@ -88,7 +88,7 @@ function AddCalendarDialog({
               value={dates}
               onChange={(e) => setDates(e.target.value)}
             >
-              <option value="christmas">Noël 2025</option>
+              <option value="christmas">Noël 2026</option>
               <option value="custom">Personnalisées</option>
             </select>
           </label>
