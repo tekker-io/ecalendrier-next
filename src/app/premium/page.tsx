@@ -1,10 +1,17 @@
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import StarIcon from "@mui/icons-material/Star";
 import Link from "next/link";
+import { getPaidPurchase } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { TopBar } from "../components/top-bar";
+import { PurchaseTracker } from "./purchase-tracker";
 
-export default async function PremiumPage() {
+export default async function PremiumPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ session_id?: string | string[] }>;
+}) {
+  const { session_id: sessionId } = await searchParams;
   const user = await getUserFromCookie();
   if (!user) {
     redirect("/");
@@ -15,10 +22,22 @@ export default async function PremiumPage() {
   const snap = await db.doc(`users/${user.uid}`).get();
   const premium = snap.get("premium");
 
-  const stripeLink = process.env.NEXT_PUBLIC_STRIPE_LINK;
+  const stripeParams = new URLSearchParams({ client_reference_id: user.uid });
+  if (user.email) {
+    // Pre-fills the email field on the Stripe payment page
+    stripeParams.set("prefilled_email", user.email);
+  }
+  const stripeLink = `${process.env.NEXT_PUBLIC_STRIPE_LINK}?${stripeParams}`;
+
+  // Set when Stripe redirects here after a payment
+  const purchase =
+    typeof sessionId === "string"
+      ? await getPaidPurchase(sessionId, user.uid)
+      : null;
 
   return (
     <>
+      {purchase && <PurchaseTracker purchase={purchase} />}
       <TopBar />
       <h1 className="text-5xl mb-4 text-yellow-100 flex items-center justify-center">
         <StarIcon />
@@ -58,7 +77,7 @@ export default async function PremiumPage() {
             </div>
           ) : (
             <Link
-              href={stripeLink + "?client_reference_id=" + user?.uid}
+              href={stripeLink}
               className="bg-yellow-400 text-black rounded py-2 px-4 lg:py-4 flex items-center gap-2"
             >
               <StarIcon />

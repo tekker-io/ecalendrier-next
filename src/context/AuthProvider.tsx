@@ -49,6 +49,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sendEvent("Login");
     sendEvent("Login via Google");
     const res = await signInWithGoogle();
+    if (res.isNewUser) {
+      sendEvent("sign_up", { method: "Google" });
+    }
     // Exchange the ID token for a secure server-side session cookie
     try {
       if (res && res.idToken) {
@@ -69,6 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sendEvent("Login");
     sendEvent("Login via email");
     const res = await signInWithMagicLink(email, url);
+    if (res.isNewUser) {
+      sendEvent("sign_up", { method: "email" });
+    }
     try {
       await createServerSession(res.idToken);
     } catch (e) {

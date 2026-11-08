@@ -6,6 +6,7 @@ import {
 import { getApps, initializeApp } from 'firebase/app';
 import {
   signOut as firebaseSignOut,
+  getAdditionalUserInfo,
   getAuth,
   GoogleAuthProvider,
   isSignInWithEmailLink,
@@ -98,7 +99,10 @@ export function getFirebaseFirestore() {
   return getFirestore();
 }
 
-export function sendEvent(name: string, params?: { [key: string]: string }) {
+export function sendEvent(
+  name: string,
+  params?: { [key: string]: string | number }
+) {
   initFirebase();
   const analytics = getAnalytics();
   logEvent(analytics, name, params);
@@ -111,7 +115,8 @@ export async function signInWithGoogle() {
   const result = await signInWithPopup(auth, googleProvider);
   // return result so caller can obtain user and idToken
   const idToken = await result.user.getIdToken();
-  return { result, idToken };
+  const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false;
+  return { result, idToken, isNewUser };
 }
 
 const EMAIL_FOR_SIGN_IN_KEY = 'emailForSignIn';
@@ -161,7 +166,8 @@ export async function signInWithMagicLink(email: string, url: string) {
   const result = await signInWithEmailLink(auth, email, url);
   writeStoredEmail(null);
   const idToken = await result.user.getIdToken();
-  return { result, idToken };
+  const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false;
+  return { result, idToken, isNewUser };
 }
 
 export async function signOut() {
