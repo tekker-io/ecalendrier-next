@@ -5,6 +5,7 @@ export function SocialButton({
   imgAlt,
   theme,
   disabled = false,
+  fullWidth = false,
   children,
   onClick,
 }: {
@@ -12,13 +13,14 @@ export function SocialButton({
   imgAlt?: string;
   theme: "blue" | "black";
   disabled?: boolean;
+  fullWidth?: boolean;
   children: React.ReactNode;
   onClick?: () => void;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`flex h-11 w-60 items-center rounded font-button font-bold cursor-pointer ${
+      className={`flex h-11 ${fullWidth ? "w-full" : "w-60"} items-center rounded font-button font-bold cursor-pointer ${
         theme === "blue" ? "bg-blue" : "bg-black"
       }`}
       disabled={disabled}

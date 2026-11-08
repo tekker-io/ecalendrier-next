@@ -7,7 +7,7 @@ export default function PrivacyPage() {
       <TopBar />
       <div>
         <h1 className="text-5xl mb-2">Politique de confidentialité</h1>
-        <p className="mb-1 italic">Dernière mise à jour : 27 octobre 2026</p>
+        <p className="mb-1 italic">Dernière mise à jour : 8 novembre 2026</p>
         <p className="mb-4">
           Cette page explique quelles données sont collectées lorsque vous
           utilisez Case du jour, pourquoi elles le sont, avec qui elles sont
@@ -27,7 +27,9 @@ export default function PrivacyPage() {
           <li>
             <strong>Compte</strong> : lors de la connexion avec Google, nous
             recevons votre identifiant Google, votre adresse email, votre nom
-            et votre prénom.
+            et votre prénom. Lors de la connexion par email, nous conservons
+            uniquement votre adresse email, à laquelle nous envoyons vos liens
+            de connexion.
           </li>
           <li>
             <strong>Calendriers</strong> : le nom, les dates, les réglages et

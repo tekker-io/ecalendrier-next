@@ -5,7 +5,9 @@ import {
   createServerSession,
   getFirebaseAuth,
   sendEvent,
+  sendMagicLink,
   signInWithGoogle,
+  signInWithMagicLink,
   signOut,
 } from "@/lib/firebaseClient";
 import type { User } from "firebase/auth";
@@ -16,6 +18,8 @@ type AuthContextValue = {
   user: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  sendMagicLink: (email: string) => Promise<void>;
+  signInWithMagicLink: (email: string, url: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -56,6 +60,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  async function handleSendMagicLink(email: string) {
+    sendEvent("Send magic link");
+    await sendMagicLink(email);
+  }
+
+  async function handleMagicLinkSignIn(email: string, url: string) {
+    sendEvent("Login");
+    sendEvent("Login via email");
+    const res = await signInWithMagicLink(email, url);
+    try {
+      await createServerSession(res.idToken);
+    } catch (e) {
+      console.error("Failed to create server session", e);
+    }
+  }
+
   async function handleSignOut() {
     try {
       sendEvent("Logout");
@@ -73,6 +93,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         loading,
         signInWithGoogle: handleSignIn,
+        sendMagicLink: handleSendMagicLink,
+        signInWithMagicLink: handleMagicLinkSignIn,
         signOut: handleSignOut,
       }}
     >

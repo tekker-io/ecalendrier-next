@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SocialButton } from "../components/social-button";
-import { GoogleButton } from "./google-button";
+import { LoginOptions } from "./login-options";
 import {
   CreateIllustration,
   ShareIllustration,
@@ -68,7 +68,7 @@ const faq = [
   {
     question: "Mes destinataires doivent-ils créer un compte ?",
     answer:
-      "Non. Il suffit d'ouvrir le lien que vous leur envoyez. Seule la personne qui crée le calendrier se connecte, avec son compte Google.",
+      "Non. Il suffit d'ouvrir le lien que vous leur envoyez. Seule la personne qui crée le calendrier se connecte, avec son compte Google ou son adresse email.",
   },
   {
     question: "Que peut-on mettre dans les cases ?",
@@ -105,7 +105,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
-      <section className="flex sm:flex-row flex-col sm:gap-0 gap-10">
+      <section className="flex sm:flex-row sm:items-center flex-col sm:gap-0 gap-10">
         <div className="flex-1 flex flex-col items-center sm:items-start">
           <Image src="/logo.svg" alt="Case du jour" width="212" height="59" />
           <h1 className="text-white font-bold text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl mt-12 mb-6 text-center sm:text-left">
@@ -115,19 +115,7 @@ export default async function Home() {
             Un calendrier de l&apos;avent digital à remplir de messages,
             photos et vidéos, à offrir à vos proches avec un simple lien.
           </p>
-          <div className="flex flex-wrap">
-            <GoogleButton />
-          </div>
-          <div className="w-20 h-0.5 bg-black my-7" />
-          <Link href="-MMm0AnXznQF1ZTaetrC">
-            <SocialButton
-              theme="black"
-              img="sample.svg"
-              imgAlt="Sample calendar icon"
-            >
-              Regarder un exemple
-            </SocialButton>
-          </Link>
+          <LoginOptions />
         </div>
         <div className="flex-1 flex">
           <Image
@@ -160,6 +148,18 @@ export default async function Home() {
             </li>
           ))}
         </ol>
+        <div className="flex flex-col items-center gap-4 mt-10">
+          <p className="text-lg">Envie de voir le résultat ?</p>
+          <Link href="-MMm0AnXznQF1ZTaetrC">
+            <SocialButton
+              theme="black"
+              img="sample.svg"
+              imgAlt="Sample calendar icon"
+            >
+              Regarder un exemple
+            </SocialButton>
+          </Link>
+        </div>
       </section>
 
       <section>
@@ -207,7 +207,7 @@ export default async function Home() {
         <p className="text-lg">
           C&apos;est gratuit et ça ne prend que quelques minutes.
         </p>
-        <GoogleButton />
+        <LoginOptions />
       </section>
     </main>
   );

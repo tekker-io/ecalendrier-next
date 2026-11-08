@@ -8,6 +8,9 @@ import {
   signOut as firebaseSignOut,
   getAuth,
   GoogleAuthProvider,
+  isSignInWithEmailLink,
+  sendSignInLinkToEmail,
+  signInWithEmailLink,
   signInWithPopup,
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
@@ -107,6 +110,56 @@ export async function signInWithGoogle() {
   const auth = getFirebaseAuth();
   const result = await signInWithPopup(auth, googleProvider);
   // return result so caller can obtain user and idToken
+  const idToken = await result.user.getIdToken();
+  return { result, idToken };
+}
+
+const EMAIL_FOR_SIGN_IN_KEY = 'emailForSignIn';
+
+function readStoredEmail() {
+  try {
+    return window.localStorage.getItem(EMAIL_FOR_SIGN_IN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredEmail(email: string | null) {
+  try {
+    if (email) {
+      window.localStorage.setItem(EMAIL_FOR_SIGN_IN_KEY, email);
+    } else {
+      window.localStorage.removeItem(EMAIL_FOR_SIGN_IN_KEY);
+    }
+  } catch {
+    // ignore (private browsing, blocked storage...)
+  }
+}
+
+export async function sendMagicLink(email: string) {
+  const auth = getFirebaseAuth();
+  auth.languageCode = 'fr';
+  await sendSignInLinkToEmail(auth, email, {
+    url: `${window.location.origin}/login/verify`,
+    handleCodeInApp: true,
+  });
+  // Remember the email so the user doesn't have to type it again when
+  // opening the link on the same device
+  writeStoredEmail(email);
+}
+
+export function isMagicLink(url: string) {
+  return isSignInWithEmailLink(getFirebaseAuth(), url);
+}
+
+export function getEmailForMagicLink() {
+  return readStoredEmail();
+}
+
+export async function signInWithMagicLink(email: string, url: string) {
+  const auth = getFirebaseAuth();
+  const result = await signInWithEmailLink(auth, email, url);
+  writeStoredEmail(null);
   const idToken = await result.user.getIdToken();
   return { result, idToken };
 }

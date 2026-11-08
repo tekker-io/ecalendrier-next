@@ -10,6 +10,7 @@ export function GoogleButton() {
     <SocialButton
       onClick={() => signInWithGoogle()}
       theme="blue"
+      fullWidth
       img="/google.svg"
       imgAlt="Google logo"
     >
