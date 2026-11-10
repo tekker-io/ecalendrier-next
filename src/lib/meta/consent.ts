@@ -17,17 +17,36 @@ const CONSENT_MAX_AGE_SECONDS = 60 * 60 * 24 * 182;
 
 export type Consent = "granted" | "denied" | null;
 
+// Choice made during this page session. Used when the cookie can't be
+// written (cookies blocked by the browser, an extension or an antivirus):
+// the banner must still close, even if the choice can't be remembered.
+let sessionConsent: Consent = null;
+
+function readCookieConsent(): Consent {
+  try {
+    const match = document.cookie.match(
+      new RegExp(`(?:^|; )${CONSENT_COOKIE}=(granted|denied)(?:;|$)`)
+    );
+    return (match?.[1] as Consent) ?? null;
+  } catch {
+    // document.cookie can throw when cookies are disabled
+    return null;
+  }
+}
+
 export function readConsent(): Consent {
   if (typeof document === "undefined") return null;
-  const match = document.cookie.match(
-    new RegExp(`(?:^|; )${CONSENT_COOKIE}=(granted|denied)(?:;|$)`)
-  );
-  return (match?.[1] as Consent) ?? null;
+  return sessionConsent ?? readCookieConsent();
 }
 
 export function writeConsent(value: "granted" | "denied") {
-  const secure = window.location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `${CONSENT_COOKIE}=${value}; Path=/; Max-Age=${CONSENT_MAX_AGE_SECONDS}; SameSite=Lax${secure}`;
+  sessionConsent = value;
+  try {
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = `${CONSENT_COOKIE}=${value}; Path=/; Max-Age=${CONSENT_MAX_AGE_SECONDS}; SameSite=Lax${secure}`;
+  } catch {
+    // Cookies disabled: the choice only lasts until the page is reloaded
+  }
   window.dispatchEvent(new Event(CONSENT_CHANGE_EVENT));
 }
 
