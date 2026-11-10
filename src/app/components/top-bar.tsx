@@ -15,13 +15,13 @@ export function TopBar() {
         <Image src="/logo.svg" alt="logo" width="212" height="59" />
       </Link>
       <div className="flex flex-wrap items-center justify-center text-white mt-4 md:mt-0">
-        <a href="https://github.com/tekker-io/ecalendrier-next" target="_blank">
+        {/* <a href="https://github.com/tekker-io/ecalendrier-next" target="_blank">
           <div className="mr-2">
             <Button size="small">
               <Image alt="GitHub" width="23" height="23" src="/github.svg" />
             </Button>
           </div>
-        </a>
+        </a> */}
         <a
           href="https://www.facebook.com/ECalendrier-de-lavent-108201144469459"
           target="_blank"
