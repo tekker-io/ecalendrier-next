@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
+import { ConsentBanner, ManageCookiesLink } from "./components/consent-banner";
+import { MetaPixel } from "./components/meta-pixel";
 import { ScreenTracker } from "./components/screen-tracker";
 import "./globals.css";
 
@@ -12,6 +14,10 @@ export const metadata: Metadata = {
   description: "Créez gratuitement votre calendrier de l'avent en ligne !",
   openGraph: {
     images: "/bg.webp",
+  },
+  other: {
+    // Meta Business domain verification for casedujour.fr
+    "facebook-domain-verification": "bk32a7l4vrg2wca6m4w4z8u8h9ewoz",
   },
 };
 
@@ -32,6 +38,8 @@ export default async function RootLayout({
         {/* <BlackFridayBanner /> */}
         <Toaster position="top-right" />
         <ScreenTracker />
+        <MetaPixel />
+        <ConsentBanner />
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <div className="px-6 sm:px-12 md:px-16 lg:px-24">
             <div className="max-w-7xl m-auto pb-16">
@@ -47,8 +55,9 @@ export default async function RootLayout({
             </div>
           </div>
           <div className="absolute bottom-0 bg-black w-full">
-            <div className="max-w-7xl m-auto">
+            <div className="max-w-7xl m-auto flex gap-4">
               <Link href="/privacy">Politique de confidentialité</Link>
+              <ManageCookiesLink />
             </div>
           </div>
         </AppRouterCacheProvider>

@@ -3,6 +3,7 @@
 import { useAuth } from "@/context/AuthProvider";
 import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 import { getAuthErrorMessage } from "@/lib/authErrors";
+import { newEventId, trackMetaEvent } from "@/lib/meta/pixel";
 import { FormEvent, useId, useState } from "react";
 
 export function EmailLoginForm() {
@@ -17,8 +18,13 @@ export function EmailLoginForm() {
     setError(null);
     setStatus("sending");
     try {
-      await sendMagicLink(email.trim());
+      const address = email.trim();
+      await sendMagicLink(address);
       setStatus("sent");
+      // Measures a link request, not a confirmed sign-up (link not clicked yet)
+      trackMetaEvent("CompleteRegistration", newEventId(), {}, {
+        email: address,
+      });
     } catch (err) {
       console.error(err);
       setError(getAuthErrorMessage(err));

@@ -7,7 +7,7 @@ export default function PrivacyPage() {
       <TopBar />
       <div>
         <h1 className="text-5xl mb-2">Politique de confidentialité</h1>
-        <p className="mb-1 italic">Dernière mise à jour : 8 novembre 2026</p>
+        <p className="mb-1 italic">Dernière mise à jour : 10 novembre 2026</p>
         <p className="mb-4">
           Cette page explique quelles données sont collectées lorsque vous
           utilisez Case du jour, pourquoi elles le sont, avec qui elles sont
@@ -47,6 +47,14 @@ export default function PrivacyPage() {
             calendrier, ajout d&apos;une image…), type d&apos;appareil et de
             navigateur.
           </li>
+          <li>
+            <strong>Mesure publicitaire (uniquement avec votre accord)</strong>{" "}
+            : pages consultées, demande d&apos;un lien de connexion, création
+            d&apos;un calendrier et achat du mode premium (montant et devise),
+            accompagnés de votre adresse email sous forme chiffrée (hachage
+            SHA-256), de votre adresse IP, de votre navigateur et des
+            identifiants des cookies Meta.
+          </li>
         </ul>
 
         <h2 className="text-3xl mb-2">Utilisation des données</h2>
@@ -64,9 +72,15 @@ export default function PrivacyPage() {
             légitime).
           </li>
         </ul>
+        <ul className="list-disc list-inside mb-4">
+          <li>
+            Si vous l&apos;acceptez, mesurer l&apos;efficacité de nos
+            publicités sur Facebook et Instagram (consentement).
+          </li>
+        </ul>
         <p className="mb-4">
-          Vos données ne sont ni vendues, ni louées, ni utilisées à des fins
-          publicitaires.
+          Vos données ne sont ni vendues, ni louées. Sans votre accord, aucune
+          donnée n&apos;est transmise à Meta.
         </p>
 
         <h2 className="text-3xl mb-2">Visibilité des calendriers</h2>
@@ -91,6 +105,15 @@ export default function PrivacyPage() {
             navigateur. Vous pouvez les bloquer ou les supprimer à tout moment
             depuis les réglages de votre navigateur.
           </li>
+          <li>
+            <strong>Pixel Meta</strong> : uniquement si vous l&apos;acceptez
+            dans le bandeau, Case du jour utilise le pixel Meta (Facebook) et
+            l&apos;API de conversion de Meta pour mesurer les résultats de ses
+            publicités. Le pixel dépose les cookies &quot;_fbp&quot; et
+            &quot;_fbc&quot;. Votre choix est conservé 6 mois dans un cookie
+            nommé &quot;cdj_consent&quot;. Vous pouvez le modifier à tout
+            moment grâce au lien « Gérer les cookies » en bas de page.
+          </li>
         </ul>
 
         <h2 className="text-3xl mb-2">Hébergement et sous-traitants</h2>
@@ -111,6 +134,10 @@ export default function PrivacyPage() {
           <li>
             <strong>Stripe</strong> (Stripe Payments Europe Ltd.) : paiement du
             mode premium.
+          </li>
+          <li>
+            <strong>Meta</strong> (Meta Platforms Ireland Ltd.) : mesure
+            publicitaire, uniquement avec votre accord.
           </li>
         </ul>
         <p className="mb-4">
@@ -137,6 +164,10 @@ export default function PrivacyPage() {
           <li>
             Les statistiques d&apos;utilisation sont conservées au maximum 14
             mois.
+          </li>
+          <li>
+            Les données de mesure publicitaire sont conservées par Meta selon
+            sa propre politique de conservation.
           </li>
         </ul>
 

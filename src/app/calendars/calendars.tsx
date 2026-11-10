@@ -5,6 +5,8 @@ import {
   getFirebaseFirestore,
   sendEvent,
 } from "@/lib/firebaseClient";
+import { calendarCreatedEventId } from "@/lib/meta/events";
+import { trackMetaEvent } from "@/lib/meta/pixel";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
@@ -54,6 +56,12 @@ function AddCalendarDialog({
 
     const calendarCollection = collection(firestore, "/calendars");
     const data = await addDoc(calendarCollection, calendarData);
+    trackMetaEvent(
+      "CalendrierCree",
+      calendarCreatedEventId(data.id),
+      {},
+      { calendarId: data.id }
+    );
     setLoading(false);
     reset();
     onClose({ id: data.id, name: name });
