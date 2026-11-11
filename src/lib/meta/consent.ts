@@ -34,9 +34,36 @@ function readCookieConsent(): Consent {
   }
 }
 
+let cookiesWritable: boolean | null = null;
+
+/**
+ * Checks once whether this browser accepts our cookies (they can be blocked
+ * by the browser settings, a company policy, an antivirus or an extension).
+ */
+function canWriteCookies(): boolean {
+  if (cookiesWritable !== null) return cookiesWritable;
+  try {
+    if (!navigator.cookieEnabled) {
+      cookiesWritable = false;
+    } else {
+      const probe = "cdj_cookie_test=1";
+      document.cookie = `${probe}; Path=/; SameSite=Lax`;
+      cookiesWritable = document.cookie.includes(probe);
+      document.cookie = "cdj_cookie_test=; Path=/; Max-Age=0; SameSite=Lax";
+    }
+  } catch {
+    cookiesWritable = false;
+  }
+  return cookiesWritable;
+}
+
 export function readConsent(): Consent {
   if (typeof document === "undefined") return null;
-  return sessionConsent ?? readCookieConsent();
+  const consent = sessionConsent ?? readCookieConsent();
+  if (consent) return consent;
+  // The choice could never be remembered: treat it as a refusal instead of
+  // showing the banner on every page
+  return canWriteCookies() ? null : "denied";
 }
 
 export function writeConsent(value: "granted" | "denied") {
