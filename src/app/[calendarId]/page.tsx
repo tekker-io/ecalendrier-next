@@ -1,4 +1,4 @@
-import admin from "@/lib/firebaseAdmin";
+import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import Link from "@mui/material/Link";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -12,7 +12,11 @@ const getCalendar = cache(
   async (calendarId: string): Promise<Calendar | null> => {
     let doc;
     try {
-      doc = await admin.firestore().collection("calendars").doc(calendarId).get();
+      doc = await admin
+        .firestore()
+        .collection("calendars")
+        .doc(calendarId)
+        .get();
     } catch (err) {
       // Firestore rejects some ids (e.g. "__foo__"): treat them as not found
       console.warn(`Invalid calendar id "${calendarId}"`, err);
@@ -33,6 +37,18 @@ const getCalendar = cache(
     };
   }
 );
+
+async function isCurrentUserAdmin(): Promise<boolean> {
+  const user = await getUserFromCookie();
+  if (!user) return false;
+  try {
+    const snap = await admin.firestore().doc(`users/${user.uid}`).get();
+    return snap.get("admin") === true;
+  } catch (err) {
+    console.warn("Failed to fetch admin status", err);
+    return false;
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -67,7 +83,10 @@ export default async function CalendarPage({
   params: Promise<{ calendarId: string }>;
 }) {
   const { calendarId } = await params;
-  const calendar = await getCalendar(calendarId);
+  const [calendar, isAdmin] = await Promise.all([
+    getCalendar(calendarId),
+    isCurrentUserAdmin(),
+  ]);
   if (!calendar) {
     notFound();
   }
@@ -100,7 +119,7 @@ export default async function CalendarPage({
           </i>
         </p>
       )}
-      <CalendarContent calendar={calendar} premium={false} />
+      <CalendarContent calendar={calendar} premium={false} admin={isAdmin} />
     </>
   );
 }

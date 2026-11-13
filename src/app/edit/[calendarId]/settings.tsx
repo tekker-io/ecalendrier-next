@@ -207,7 +207,7 @@ function SettingsDialog({
                 checked={randomized > 0}
                 onChange={(e) =>
                   setRandomized(
-                    e.target.checked ? Math.ceil(Math.random() * 100) : 0
+                    e.target.checked ? Math.ceil(Math.random() * 100) : 0,
                   )
                 }
               />
