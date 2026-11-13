@@ -80,6 +80,15 @@ export async function writeFileBytes(filename: string, content: Blob) {
   await uploadBytes(fileRef, content);
 }
 
+/** Uploads a file and returns its public download URL */
+export async function uploadMedia(filename: string, content: Blob) {
+  initFirebase();
+  const storage = getStorage();
+  const fileRef = ref(storage, filename);
+  await uploadBytes(fileRef, content, { contentType: content.type });
+  return getDownloadURL(fileRef);
+}
+
 export async function writeFile(filename: string, content: string) {
   initFirebase();
   const storage = getStorage();

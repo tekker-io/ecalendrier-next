@@ -7,6 +7,7 @@ import { Calendar } from "../../entities";
 import DeleteCalendar from "./delete";
 import { SettingsButton } from "./settings";
 import { ShareButton } from "./share";
+import { ShuffleButton } from "./shuffle";
 
 export default function CalendarEdit({
   calendar,
@@ -27,6 +28,11 @@ export default function CalendarEdit({
         <div className="text-3xl">{localCalendar.name}</div>
         <div className="flex">
           <ShareButton calendar={localCalendar} />
+          <ShuffleButton
+            premium={premium}
+            calendar={localCalendar}
+            setLocalCalendar={setLocalCalendar}
+          />
           <SettingsButton
             premium={premium}
             calendar={localCalendar}

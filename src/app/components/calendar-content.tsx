@@ -1,123 +1,19 @@
 "use client";
 
-import { getFile, sendEvent, writeFile } from "@/lib/firebaseClient";
+import { sendEvent } from "@/lib/firebaseClient";
 import { shuffle } from "@/lib/random";
 import EditIcon from "@mui/icons-material/Edit";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import Switch from "@mui/material/Switch";
 import Tooltip from "@mui/material/Tooltip";
-import dynamic from "next/dynamic";
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Calendar } from "../entities";
 import { Button } from "./button";
-import { Spinner } from "./spinner";
-
-const Editor = dynamic(() => import("./editor"), { ssr: false });
+import { DayDialog } from "./day-dialog";
 
 interface Day {
   date: number;
   available: boolean;
   index: number;
-}
-
-function DayDialog({
-  onClose,
-  fileName,
-  editing,
-  premium,
-}: {
-  onClose: () => void;
-  fileName: string;
-  editing: boolean;
-  premium: boolean;
-}) {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [preview, setPreview] = useState(false);
-  const [fileContent, setFileContent] = useState<string>("");
-  const quillRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    getFile(fileName)
-      .then((fileContent) => {
-        setFileContent(fileContent);
-      })
-      .catch(() => {
-        setFileContent("");
-      })
-      .finally(() => setLoading(false));
-  }, [fileName]);
-
-  function save() {
-    if (!premium && fileContent.length > 2000000) return;
-    setSaving(true);
-    sendEvent("Save day");
-    writeFile(fileName, fileContent).then(() => {
-      setSaving(false);
-      onClose();
-    });
-  }
-
-  return (
-    <Dialog open={true} onClose={onClose} maxWidth="lg">
-      <DialogContent>
-        {loading ? (
-          <Spinner color="black" />
-        ) : (
-          <>
-            {editing && (
-              <div className="mb-3 text-right">
-                Prévisualiser:{" "}
-                <Switch value={preview} onChange={() => setPreview(!preview)} />
-              </div>
-            )}
-            {editing && !preview && (
-              <Editor
-                ref={quillRef}
-                defaultValue={fileContent}
-                onTextChange={(text) => {
-                  setFileContent(text);
-                }}
-              />
-            )}
-            {(!editing || preview) && (
-              <div className="ql-snow">
-                <div
-                  className="ql-editor"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      fileContent ||
-                      "<i>Le père noël n'est pas encore passé par là...</i>",
-                  }}
-                />
-              </div>
-            )}
-            {editing && (
-              <div className="mt-4">
-                <Button onClick={() => save()} theme="success">
-                  {saving ? <Spinner /> : "OK"}
-                </Button>
-              </div>
-            )}
-            {editing && !premium && fileContent.length > 2000000 && (
-              <p className="text-red mt-4">
-                Chaque jour est limité à 2Mo de données, essayez de réduire la
-                taille de vos images ou{" "}
-                <Link href="/premium" target="_blank" className="!underline">
-                  activez le mode premium
-                </Link>
-                .
-              </p>
-            )}
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
 }
 
 export function CalendarContent({
@@ -147,12 +43,12 @@ export function CalendarContent({
         new Date(
           calendar.startDate
             ? calendar.startDate + "T00:00:00"
-            : "2020-12-01T00:00:00"
+            : "2020-12-01T00:00:00",
         ),
         new Date(
           calendar.endDate
             ? calendar.endDate + "T00:00:00"
-            : "2020-12-25T00:00:00"
+            : "2020-12-25T00:00:00",
         ),
       ];
     }
@@ -197,7 +93,7 @@ export function CalendarContent({
           calendar.id +
           "/" +
           day.index +
-          ".html"
+          ".html",
       );
     }
   }

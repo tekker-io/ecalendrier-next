@@ -39,6 +39,17 @@ a {
 }
 
 /*
+** Images with width/height attributes (the simple editor also sets an inline
+** width that keeps them under 80vh). Fallback for images without that style,
+** e.g. after going through Quill: keep the ratio, never stretch.
+*/
+.ql-editor img[width][height] {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/*
 ** Quill translations (urgh...) https://github.com/slab/quill/issues/2339
 */
 

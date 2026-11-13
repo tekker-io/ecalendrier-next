@@ -63,7 +63,7 @@ const faq = [
   {
     question: "Est-ce vraiment gratuit ?",
     answer:
-      "Oui, la création et le partage d'un calendrier sont entièrement gratuits. Un mode premium optionnel (7€ à vie) permet de retirer le logo, de mélanger l'ordre des cases, de personnaliser l'image des cadeaux et de lever la limite de 2 Mo par case.",
+      "Oui, la création et le partage d'un calendrier sont entièrement gratuits. Un mode premium optionnel (7€ à vie) permet de retirer le logo, de mélanger l'ordre des cases, de personnaliser l'image des cadeaux et de garder vos photos en qualité HD, sans compression.",
   },
   {
     question: "Mes destinataires doivent-ils créer un compte ?",

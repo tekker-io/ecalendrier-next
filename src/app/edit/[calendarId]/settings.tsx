@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/app/components/button";
+import { PremiumDialog } from "@/app/components/premium-dialog";
 import { Spinner } from "@/app/components/spinner";
 import { Calendar } from "@/app/entities";
 import {
@@ -10,15 +11,79 @@ import {
   sendEvent,
   writeFileBytes,
 } from "@/lib/firebaseClient";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { PremiumFeature } from "@/lib/premium";
+import LockIcon from "@mui/icons-material/Lock";
 import SettingsIcon from "@mui/icons-material/Settings";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import { Dialog, DialogContent, Switch } from "@mui/material";
+import StarIcon from "@mui/icons-material/Star";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Switch,
+  useMediaQuery,
+} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import { doc, updateDoc } from "firebase/firestore";
 import NextImage from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import toast from "react-hot-toast";
+
+const inputClassName =
+  "rounded border border-gray-400 px-3 py-2 outline-none w-full";
+
+/**
+ * One premium option. For free users the control is replaced by a lock and
+ * the whole row opens the premium dialog.
+ */
+function OptionRow({
+  title,
+  description,
+  locked,
+  onLockedClick,
+  children,
+}: {
+  title: string;
+  description?: string;
+  locked: boolean;
+  onLockedClick: () => void;
+  children: React.ReactNode;
+}) {
+  const content = (
+    <>
+      <div className="flex-1">
+        <h4 className="font-bold">{title}</h4>
+        {description && (
+          <p className="text-sm text-gray-600">{description}</p>
+        )}
+      </div>
+      <div className="shrink-0 flex items-center gap-2">
+        {locked ? (
+          <span className="flex items-center gap-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1">
+            <LockIcon fontSize="inherit" />
+            Premium
+          </span>
+        ) : (
+          children
+        )}
+      </div>
+    </>
+  );
+
+  const className = "flex items-center gap-4 py-3";
+  if (locked) {
+    return (
+      <button
+        type="button"
+        onClick={onLockedClick}
+        className={`${className} w-full text-left cursor-pointer hover:bg-gray-50 rounded px-2 -mx-2`}
+      >
+        {content}
+      </button>
+    );
+  }
+  return <div className={className}>{content}</div>;
+}
 
 function SettingsDialog({
   calendar,
@@ -38,6 +103,11 @@ function SettingsDialog({
   const [displayCta, setDisplayCta] = useState(calendar.displayCta);
   const [randomized, setRandomized] = useState(calendar.randomized);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [upsellFeature, setUpsellFeature] = useState<PremiumFeature | null>(
+    null
+  );
+  const isMobile = useMediaQuery("(max-width:639px)");
 
   const dayImageFileName =
     calendar.author + "/calendars/" + calendar.id + "/dayImage";
@@ -56,189 +126,219 @@ function SettingsDialog({
       displayCta: displayCta,
       randomized: randomized,
     };
-    updateDoc(calendarRef, newValues).then(() => {
-      onUpdate(newValues);
-      onClose();
-    });
+    updateDoc(calendarRef, newValues)
+      .then(() => {
+        onUpdate(newValues);
+        onClose();
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("L'enregistrement a échoué, veuillez réessayer.");
+        setSaving(false);
+      });
   }
 
-  function uploadDayImage(e: React.ChangeEvent<HTMLInputElement>) {
+  async function uploadDayImage(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
     sendEvent("Upload day image");
-    writeFileBytes(dayImageFileName, file).then(() => {
+    setUploadingImage(true);
+    try {
+      await writeFileBytes(dayImageFileName, file);
+      const url = await getMediaURL(dayImageFileName);
+      const newValues = { dayImage: url + "v=" + Date.now() };
       const firestore = getFirebaseFirestore();
-      const calendarRef = doc(firestore, "calendars/" + calendar.id);
-      getMediaURL(dayImageFileName).then((url) => {
-        const newValues = {
-          dayImage: url + "v=" + Date.now(),
-        };
-        updateDoc(calendarRef, newValues).then(() => {
-          onUpdate(newValues);
-        });
-      });
-    });
+      await updateDoc(doc(firestore, "calendars/" + calendar.id), newValues);
+      onUpdate(newValues);
+    } catch (err) {
+      console.error(err);
+      toast.error("L'envoi de l'image a échoué, veuillez réessayer.");
+    } finally {
+      setUploadingImage(false);
+    }
   }
 
-  function deleteImage() {
+  async function deleteImage() {
     sendEvent("Delete day image");
     const firestore = getFirebaseFirestore();
-    const calendarRef = doc(firestore, "calendars/" + calendar.id);
-    const newValues = {
-      dayImage: null,
-    };
-    deleteFile(dayImageFileName).then(() => {
-      updateDoc(calendarRef, newValues).then(() => {
-        onUpdate(newValues);
-      });
-    });
+    const newValues = { dayImage: null };
+    try {
+      await deleteFile(dayImageFileName);
+      await updateDoc(doc(firestore, "calendars/" + calendar.id), newValues);
+      onUpdate(newValues);
+    } catch (err) {
+      console.error(err);
+      toast.error("La suppression de l'image a échoué, veuillez réessayer.");
+    }
   }
 
+  const locked = !premium;
+  const openUpsell = (feature: PremiumFeature) => () =>
+    setUpsellFeature(feature);
+
   return (
-    <Dialog open onClose={onClose}>
-      <DialogContent className="pt-10 px-10">
-        <h2 className="text-3xl pb-8 font-bold">Paramètres du calendrier</h2>
-        <label htmlFor="name">
-          <h3 className="text-lg pb-3 font-bold">Nom du calendrier</h3>
-          <input
-            required
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            name="name"
-            className="rounded bg-none border-solid border-gray-400 border px-4 py-2 outline-none w-full"
-            placeholder="Nom"
-          />
-        </label>
-        <label htmlFor="dates">
-          <h3 className="text-lg pb-3 pt-3 font-bold">Dates du calendrier</h3>
-          <div className="gap-1 flex items-center md:flex-row flex-col">
-            Du
+    <Dialog
+      open
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      fullScreen={isMobile}
+    >
+      {upsellFeature && (
+        <PremiumDialog
+          feature={upsellFeature}
+          onClose={() => setUpsellFeature(null)}
+        />
+      )}
+      <DialogContent className="p-6 sm:p-8">
+        <h2 className="text-3xl pb-6 font-bold">Options du calendrier</h2>
+
+        <section className="flex flex-col gap-4">
+          <label className="flex flex-col gap-2">
+            <h3 className="font-bold">Nom du calendrier</h3>
             <input
-              type="date"
-              id="startDate"
-              name="startDate"
-              className="rounded bg-none border-solid border-gray-400 border px-4 py-2 outline-none w-full"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              name="name"
+              className={inputClassName}
+              placeholder="Nom"
             />
-            au
-            <input
-              type="date"
-              id="endDate"
-              name="endDate"
-              className="rounded bg-none border-solid border-gray-400 border px-4 py-2 outline-none w-full"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
+          </label>
+          <div className="flex flex-col gap-2">
+            <h3 className="font-bold">Dates du calendrier</h3>
+            <div className="grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto_1fr] items-center gap-2">
+              <label htmlFor="startDate">Du</label>
+              <input
+                type="date"
+                id="startDate"
+                name="startDate"
+                className={inputClassName}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <label htmlFor="endDate">au</label>
+              <input
+                type="date"
+                id="endDate"
+                name="endDate"
+                className={inputClassName}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
           </div>
-        </label>
-        {premium && (
-          <label className="flex justify-between items-center">
-            <h3 className="text-lg pb-3 pt-3 font-bold">
-              Modifier l&apos;image des cases
-            </h3>
-            {calendar.dayImage ? (
-              <div className="relative">
-                <div className="absolute left-0 top-0 size-full cursor-pointer flex items-center justify-center hover:bg-black/30 rounded-sm group">
-                  <div
-                    className="group-hover:block hidden"
-                    onClick={deleteImage}
-                  >
-                    <Button>
-                      <DeleteIcon className="text-2xl" />
-                    </Button>
-                  </div>
-                </div>
-                <NextImage
-                  src={calendar.dayImage}
-                  alt="Image du jour"
-                  width={100}
-                  height={100}
-                />
-              </div>
-            ) : (
-              <Button>
-                <label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => uploadDayImage(e)}
-                  />
-                  <UploadFileIcon className="cursor-pointer" />
-                </label>
-              </Button>
-            )}
-          </label>
-        )}
-        {premium && (
-          <label className="flex justify-between items-center">
-            <h3 className="text-lg pb-3 pt-3 font-bold">
-              Afficher le logo du site
-            </h3>
-            <Switch
-              checked={displayLogo}
-              onChange={(e) => setDisplayLogo(e.target.checked)}
-            />
-          </label>
-        )}
-        {premium && (
-          <label className="flex justify-between items-center">
-            <h3 className="text-lg pb-3 pt-3 font-bold">
-              Bouton &quot;Créer mon propre calendrier&quot;
-            </h3>
-            <Switch
-              checked={displayCta}
-              onChange={(e) => setDisplayCta(e.target.checked)}
-            />
-          </label>
-        )}
-        {premium && (
-          <div>
-            <label className="flex justify-between items-center">
-              <div className="pb-3 pt-3">
-                <h3 className="text-lg font-bold">Mélanger les jours</h3>
-                <i>
-                  L&apos;ordre ne change que quand vous activez l&apos;option.
-                </i>
-              </div>
+        </section>
+
+        <section className="mt-8">
+          <h3 className="text-xl font-bold flex items-center gap-2 mb-2">
+            <StarIcon className="text-yellow-500" />
+            Personnalisation
+          </h3>
+
+          {locked && (
+            <div className="rounded-lg bg-yellow-50 border border-yellow-300 p-4 mb-2 flex flex-col sm:flex-row sm:items-center gap-3">
+              <p className="flex-1 text-sm">
+                Ces options sont réservées au <strong>mode premium</strong> :
+                7 € une seule fois, pour tous vos calendriers.
+              </p>
+              <Link
+                href="/premium"
+                onClick={() => sendEvent("Click premium from settings")}
+                className="shrink-0 flex items-center justify-center gap-1 rounded bg-yellow-400 text-black font-bold py-2 px-4"
+              >
+                <StarIcon fontSize="small" />
+                Découvrir
+              </Link>
+            </div>
+          )}
+
+          <div className="divide-y divide-gray-200">
+            <OptionRow
+              title="Mélanger les jours"
+              description="Les cases apparaissent dans le désordre. L'ordre change à chaque activation."
+              locked={locked}
+              onLockedClick={openUpsell("shuffle")}
+            >
               <Switch
                 checked={randomized > 0}
                 onChange={(e) =>
                   setRandomized(
-                    e.target.checked ? Math.ceil(Math.random() * 100) : 0,
+                    e.target.checked ? Math.ceil(Math.random() * 100) : 0
                   )
                 }
               />
-            </label>
+            </OptionRow>
+
+            <OptionRow
+              title="Image des cadeaux"
+              description="Remplacez les paquets cadeaux par l'image de votre choix."
+              locked={locked}
+              onLockedClick={openUpsell("dayImage")}
+            >
+              <NextImage
+                src={calendar.dayImage || "/gift.svg"}
+                alt="Image des cases"
+                width={48}
+                height={48}
+                className="w-12 h-12 object-contain"
+              />
+              <div className="flex flex-col items-start text-sm">
+                <label className="underline cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={uploadDayImage}
+                    disabled={uploadingImage}
+                  />
+                  {uploadingImage ? <Spinner color="black" /> : "Changer"}
+                </label>
+                {calendar.dayImage && !uploadingImage && (
+                  <button
+                    type="button"
+                    onClick={deleteImage}
+                    className="underline cursor-pointer"
+                  >
+                    Retirer
+                  </button>
+                )}
+              </div>
+            </OptionRow>
+
+            <OptionRow
+              title="Afficher le logo Case du jour"
+              locked={locked}
+              onLockedClick={openUpsell("logo")}
+            >
+              <Switch
+                checked={displayLogo}
+                onChange={(e) => setDisplayLogo(e.target.checked)}
+              />
+            </OptionRow>
+
+            <OptionRow
+              title="Afficher le bouton « Créer mon propre calendrier »"
+              locked={locked}
+              onLockedClick={openUpsell("cta")}
+            >
+              <Switch
+                checked={displayCta}
+                onChange={(e) => setDisplayCta(e.target.checked)}
+              />
+            </OptionRow>
           </div>
-        )}
-        {!premium && (
-          <div className="pt-4">
-            <i>
-              En activant le{" "}
-              <Link href="/premium" target="_blank" className="!underline">
-                mode premium
-              </Link>
-              , vous pouvez aussi :
-              <ul className="list-disc list-inside">
-                <li>Mélanger les jours (nouveau !)</li>
-                <li>Changer l&apos;image des cadeaux (nouveau !)</li>
-                <li>Cacher le logo du site</li>
-                <li>
-                  Cacher le bouton &quot;Créer mon propre calendrier&quot;
-                </li>
-              </ul>
-            </i>
-          </div>
-        )}
-        <div className="pt-4">
-          <Button theme="success" onClick={save}>
-            {saving ? <Spinner /> : "Enregistrer"}
-          </Button>
-        </div>
+        </section>
       </DialogContent>
+      <DialogActions className="px-6 pb-4">
+        <Button onClick={onClose}>
+          <span className="text-black">Annuler</span>
+        </Button>
+        <Button theme="success" onClick={save}>
+          {saving ? <Spinner /> : "Enregistrer"}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
