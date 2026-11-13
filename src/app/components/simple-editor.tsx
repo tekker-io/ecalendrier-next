@@ -25,7 +25,7 @@ export function usePhotoPreviewUrl(photo: SimplePhoto | null) {
   const localBlob = photo?.kind === "local" ? photo.blob : null;
   const objectUrl = useMemo(
     () => (localBlob ? URL.createObjectURL(localBlob) : null),
-    [localBlob]
+    [localBlob],
   );
   useEffect(() => {
     return () => {
@@ -63,6 +63,8 @@ function PhotoInput({
   );
 }
 
+const MIN_OPTIMIZATION_DURATION = 4000;
+
 function TooLargePanel({
   file,
   onOptimized,
@@ -79,19 +81,24 @@ function TooLargePanel({
     sendEvent("Optimize photo", { size: file.size });
     setOptimizing(true);
     try {
-      const blob = await optimizeImage(file, FREE_SIZE_LIMIT);
+      // The optimization always shows its progress for at least a few
+      // seconds, even when it is faster
+      const [blob] = await Promise.all([
+        optimizeImage(file, FREE_SIZE_LIMIT),
+        new Promise((resolve) =>
+          setTimeout(resolve, MIN_OPTIMIZATION_DURATION),
+        ),
+      ]);
       if (blob.size > FREE_SIZE_LIMIT) {
         toast.error(
-          "Impossible de réduire suffisamment cette photo, essayez-en une autre."
+          "Impossible de réduire suffisamment cette photo, essayez-en une autre.",
         );
         return;
       }
       onOptimized(blob);
     } catch (err) {
       console.error(err);
-      toast.error(
-        "Impossible d'optimiser cette photo, essayez-en une autre."
-      );
+      toast.error("Impossible d'optimiser cette photo, essayez-en une autre.");
     } finally {
       setOptimizing(false);
     }
@@ -114,7 +121,14 @@ function TooLargePanel({
           disabled={optimizing}
           className="flex-1 flex items-center justify-center gap-2 rounded bg-green text-white font-bold py-3 px-4 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
         >
-          {optimizing ? <Spinner /> : "Optimiser ma photo (gratuit)"}
+          {optimizing ? (
+            <>
+              <Spinner />
+              Optimisation de votre photo…
+            </>
+          ) : (
+            "Optimiser ma photo (gratuit)"
+          )}
         </button>
         <Link
           href="/premium"
@@ -162,7 +176,7 @@ export function SimpleEditor({
     }
     if (file.size > MAX_SIZE_LIMIT) {
       toast.error(
-        `Cette photo est trop lourde (${formatSize(file.size)}), la limite est de ${formatSize(MAX_SIZE_LIMIT)}.`
+        `Cette photo est trop lourde (${formatSize(file.size)}), la limite est de ${formatSize(MAX_SIZE_LIMIT)}.`,
       );
       return;
     }
@@ -199,10 +213,7 @@ export function SimpleEditor({
             className="max-h-[45vh] max-w-full rounded"
           />
           <div className="flex gap-4 text-sm">
-            <PhotoInput
-              onFile={onFile}
-              className="underline cursor-pointer"
-            >
+            <PhotoInput onFile={onFile} className="underline cursor-pointer">
               Changer la photo
             </PhotoInput>
             <button
@@ -240,8 +251,8 @@ export function SimpleEditor({
         onClick={onSwitchToAdvanced}
         className="self-center underline cursor-pointer text-sm text-gray-600"
       >
-        Passer à l&apos;éditeur avancé (mise en forme, plusieurs photos,
-        vidéos YouTube…)
+        Passer à l&apos;éditeur avancé (mise en forme, plusieurs photos, vidéos
+        YouTube…)
       </button>
     </div>
   );
