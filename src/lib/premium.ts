@@ -2,13 +2,25 @@
 
 export const PREMIUM_PRICE = "7 €";
 
-export type PremiumFeature = "shuffle" | "dayImage" | "hd" | "logo" | "cta";
+export type PremiumFeature =
+  | "video"
+  | "shuffle"
+  | "dayImage"
+  | "hd"
+  | "logo"
+  | "cta";
 
 export const PREMIUM_FEATURES: {
   id: PremiumFeature;
   title: string;
   description: string;
 }[] = [
+  {
+    id: "video",
+    title: "Vidéos jusqu'à 100 Mo",
+    description:
+      "Ajoutez vos propres vidéos dans les cases, directement depuis votre téléphone.",
+  },
   {
     id: "shuffle",
     title: "Mélanger les jours",

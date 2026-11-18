@@ -7,22 +7,25 @@ import {
   FREE_SIZE_LIMIT,
   headingLevel,
   MAX_SIZE_LIMIT,
-  PhotoSize,
+  MediaSize,
+  MediaType,
 } from "@/lib/simple-day";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import StarIcon from "@mui/icons-material/Star";
+import VideocamIcon from "@mui/icons-material/Videocam";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { PremiumDialog } from "./premium-dialog";
 import { Spinner } from "./spinner";
 
-/** A photo already uploaded, or one picked on this device and not saved yet */
-export type SimplePhoto =
-  | { kind: "remote"; url: string; size: PhotoSize | null }
-  | { kind: "local"; blob: Blob };
+/** A media already uploaded, or one picked on this device and not saved yet */
+export type SimpleMedia =
+  | { kind: "remote"; type: MediaType; url: string; size: MediaSize | null }
+  | { kind: "local"; type: MediaType; blob: Blob };
 
-export function usePhotoPreviewUrl(photo: SimplePhoto | null) {
-  const localBlob = photo?.kind === "local" ? photo.blob : null;
+export function useMediaPreviewUrl(media: SimpleMedia | null) {
+  const localBlob = media?.kind === "local" ? media.blob : null;
   const objectUrl = useMemo(
     () => (localBlob ? URL.createObjectURL(localBlob) : null),
     [localBlob],
@@ -32,11 +35,18 @@ export function usePhotoPreviewUrl(photo: SimplePhoto | null) {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [objectUrl]);
-  if (!photo) return null;
-  return photo.kind === "remote" ? photo.url : objectUrl;
+  if (!media) return null;
+  return media.kind === "remote" ? media.url : objectUrl;
 }
 
-function PhotoInput({
+function isVideoFile(file: File) {
+  // Some Android browsers leave the type empty
+  return (
+    file.type.startsWith("video/") || /\.(mp4|mov|m4v|webm)$/i.test(file.name)
+  );
+}
+
+function MediaInput({
   onFile,
   children,
   className,
@@ -49,7 +59,7 @@ function PhotoInput({
     <label className={className}>
       <input
         type="file"
-        accept="image/*"
+        accept="image/*,video/*"
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
@@ -152,26 +162,48 @@ function TooLargePanel({
 }
 
 export function SimpleEditor({
-  photo,
-  onPhotoChange,
+  media,
+  onMediaChange,
   text,
   onTextChange,
   premium,
   onSwitchToAdvanced,
 }: {
-  photo: SimplePhoto | null;
-  onPhotoChange: (photo: SimplePhoto | null) => void;
+  media: SimpleMedia | null;
+  onMediaChange: (media: SimpleMedia | null) => void;
   text: string;
   onTextChange: (text: string) => void;
   premium: boolean;
   onSwitchToAdvanced: () => void;
 }) {
   const [tooLargeFile, setTooLargeFile] = useState<File | null>(null);
-  const previewUrl = usePhotoPreviewUrl(photo);
+  const [videoUpsellOpen, setVideoUpsellOpen] = useState(false);
+  const previewUrl = useMediaPreviewUrl(media);
+
+  function onVideo(file: File) {
+    if (!premium) {
+      sendEvent("Video selected without premium", { size: file.size });
+      setVideoUpsellOpen(true);
+      return;
+    }
+    if (file.size > MAX_SIZE_LIMIT) {
+      toast.error(
+        `Cette vidéo pèse ${formatSize(file.size)}, la limite est de ${formatSize(MAX_SIZE_LIMIT)}. Essayez une vidéo plus courte.`,
+      );
+      return;
+    }
+    sendEvent("Video selected", { size: file.size });
+    setTooLargeFile(null);
+    onMediaChange({ kind: "local", type: "video", blob: file });
+  }
 
   function onFile(file: File) {
+    if (isVideoFile(file)) {
+      onVideo(file);
+      return;
+    }
     if (!file.type.startsWith("image/")) {
-      toast.error("Ce fichier n'est pas une photo.");
+      toast.error("Ce fichier n'est ni une photo ni une vidéo.");
       return;
     }
     if (file.size > MAX_SIZE_LIMIT) {
@@ -186,7 +218,7 @@ export function SimpleEditor({
       return;
     }
     setTooLargeFile(null);
-    onPhotoChange({ kind: "local", blob: file });
+    onMediaChange({ kind: "local", type: "image", blob: file });
   }
 
   const level = headingLevel(text);
@@ -195,44 +227,69 @@ export function SimpleEditor({
 
   return (
     <div className="flex flex-col gap-4 text-black">
+      {videoUpsellOpen && (
+        <PremiumDialog
+          feature="video"
+          onClose={() => setVideoUpsellOpen(false)}
+        />
+      )}
       {tooLargeFile ? (
         <TooLargePanel
           file={tooLargeFile}
           onCancel={() => setTooLargeFile(null)}
           onOptimized={(blob) => {
             setTooLargeFile(null);
-            onPhotoChange({ kind: "local", blob });
+            onMediaChange({ kind: "local", type: "image", blob });
           }}
         />
-      ) : photo && previewUrl ? (
+      ) : media && previewUrl ? (
         <div className="flex flex-col items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={previewUrl}
-            alt="Photo de la case"
-            className="max-h-[45vh] max-w-full rounded"
-          />
+          {media.type === "video" ? (
+            <video
+              src={`${previewUrl}#t=0.1`}
+              controls
+              playsInline
+              preload="metadata"
+              className="max-h-[45vh] max-w-full rounded bg-black"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={previewUrl}
+              alt="Photo de la case"
+              className="max-h-[45vh] max-w-full rounded"
+            />
+          )}
           <div className="flex gap-4 text-sm">
-            <PhotoInput onFile={onFile} className="underline cursor-pointer">
-              Changer la photo
-            </PhotoInput>
+            <MediaInput onFile={onFile} className="underline cursor-pointer">
+              Changer
+            </MediaInput>
             <button
               type="button"
               className="underline cursor-pointer"
-              onClick={() => onPhotoChange(null)}
+              onClick={() => onMediaChange(null)}
             >
-              Retirer la photo
+              Retirer
             </button>
           </div>
         </div>
       ) : (
-        <PhotoInput
+        <MediaInput
           onFile={onFile}
           className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-400 py-10 px-4 cursor-pointer text-gray-600 hover:bg-gray-100"
         >
-          <AddAPhotoIcon fontSize="large" />
-          <span className="font-bold">Ajouter une photo</span>
-        </PhotoInput>
+          <span className="flex gap-2">
+            <AddAPhotoIcon fontSize="large" />
+            <VideocamIcon fontSize="large" />
+          </span>
+          <span className="font-bold">Ajouter une photo ou une vidéo</span>
+          {!premium && (
+            <span className="text-xs flex items-center gap-1">
+              <StarIcon fontSize="inherit" className="text-yellow-500" />
+              Vidéos réservées au mode premium
+            </span>
+          )}
+        </MediaInput>
       )}
 
       <label className="flex flex-col gap-2">

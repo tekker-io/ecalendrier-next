@@ -2,11 +2,61 @@
 // @ts-nocheck
 // from https://quilljs.com/playground/react
 
+import { UPLOADED_VIDEO_CLASS } from "@/lib/simple-day";
 import Quill from "quill";
 import { MediaResize } from "quill-media-resize";
 import { RefObject, useEffect, useLayoutEffect, useRef } from "react";
 
 Quill.register("modules/mediaResize", MediaResize);
+
+const BlockEmbed = Quill.import("blots/block/embed");
+const VIDEO_ATTRIBUTES = ["width", "height"];
+
+/**
+ * Video uploaded from the simple editor (<video> tag). Quill only knows
+ * embedded videos (YouTube iframes) and would drop these otherwise.
+ */
+class UploadedVideo extends BlockEmbed {
+  static blotName = "uploadedVideo";
+  static tagName = "VIDEO";
+  static className = UPLOADED_VIDEO_CLASS;
+
+  static create(src) {
+    const node = super.create();
+    node.setAttribute("src", src);
+    node.setAttribute("controls", "");
+    node.setAttribute("playsinline", "");
+    node.setAttribute("preload", "metadata");
+    return node;
+  }
+
+  static value(node) {
+    return node.getAttribute("src");
+  }
+
+  static formats(node) {
+    return VIDEO_ATTRIBUTES.reduce((formats, attribute) => {
+      if (node.hasAttribute(attribute)) {
+        formats[attribute] = node.getAttribute(attribute);
+      }
+      return formats;
+    }, {});
+  }
+
+  format(name, value) {
+    if (VIDEO_ATTRIBUTES.includes(name)) {
+      if (value) {
+        this.domNode.setAttribute(name, value);
+      } else {
+        this.domNode.removeAttribute(name);
+      }
+    } else {
+      super.format(name, value);
+    }
+  }
+}
+
+Quill.register(UploadedVideo);
 
 export default function Editor({
   readOnly = false,

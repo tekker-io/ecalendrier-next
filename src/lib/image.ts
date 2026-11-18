@@ -78,3 +78,31 @@ export async function getImageSize(
     URL.revokeObjectURL(url);
   }
 }
+
+/** Size of a video, read from its metadata. Null if the browser can't read it */
+export function getVideoSize(
+  file: Blob,
+  timeoutMs = 10000
+): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    const done = (size: { width: number; height: number } | null) => {
+      clearTimeout(timeout);
+      URL.revokeObjectURL(url);
+      resolve(size);
+    };
+    // Some formats can't be decoded by every browser (e.g. HEVC on Firefox)
+    const timeout = setTimeout(() => done(null), timeoutMs);
+    video.preload = "metadata";
+    video.muted = true;
+    video.onloadedmetadata = () =>
+      done(
+        video.videoWidth > 0 && video.videoHeight > 0
+          ? { width: video.videoWidth, height: video.videoHeight }
+          : null
+      );
+    video.onerror = () => done(null);
+    video.src = url;
+  });
+}

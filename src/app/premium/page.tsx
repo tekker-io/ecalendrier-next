@@ -13,6 +13,7 @@ import HighQualityIcon from "@mui/icons-material/HighQuality";
 import LinkOffIcon from "@mui/icons-material/LinkOff";
 import LockIcon from "@mui/icons-material/Lock";
 import StarIcon from "@mui/icons-material/Star";
+import VideocamIcon from "@mui/icons-material/Videocam";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { TopBar } from "../components/top-bar";
@@ -21,6 +22,7 @@ import { PremiumActivation } from "./premium-activation";
 import { PurchaseTracker } from "./purchase-tracker";
 
 const featureIcons: Record<PremiumFeature, React.ReactNode> = {
+  video: <VideocamIcon fontSize="large" />,
   shuffle: <CasinoIcon fontSize="large" />,
   dayImage: <CardGiftcardIcon fontSize="large" />,
   hd: <HighQualityIcon fontSize="large" />,
@@ -86,8 +88,9 @@ export default async function PremiumPage({
             Un calendrier encore plus personnel
           </h1>
           <p className="text-lg">
-            Mélangez les jours, choisissez l&apos;image des cadeaux, gardez vos
-            photos en HD et retirez toute trace de Case du jour.
+            Ajoutez vos vidéos, mélangez les jours, choisissez l&apos;image des
+            cadeaux, gardez vos photos en HD et retirez toute trace de Case du
+            jour.
           </p>
 
           {premium ? (

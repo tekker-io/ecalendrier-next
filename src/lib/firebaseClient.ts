@@ -21,6 +21,7 @@ import {
   getStorage,
   ref,
   uploadBytes,
+  uploadBytesResumable,
   uploadString,
 } from 'firebase/storage';
 
@@ -80,12 +81,27 @@ export async function writeFileBytes(filename: string, content: Blob) {
   await uploadBytes(fileRef, content);
 }
 
-/** Uploads a file and returns its public download URL */
-export async function uploadMedia(filename: string, content: Blob) {
+/**
+ * Uploads a file and returns its public download URL.
+ * onProgress receives the uploaded share, between 0 and 1.
+ */
+export async function uploadMedia(
+  filename: string,
+  content: Blob,
+  onProgress?: (progress: number) => void
+) {
   initFirebase();
   const storage = getStorage();
   const fileRef = ref(storage, filename);
-  await uploadBytes(fileRef, content, { contentType: content.type });
+  const task = uploadBytesResumable(fileRef, content, {
+    contentType: content.type || undefined,
+  });
+  task.on('state_changed', (snapshot) => {
+    if (snapshot.totalBytes > 0) {
+      onProgress?.(snapshot.bytesTransferred / snapshot.totalBytes);
+    }
+  });
+  await task;
   return getDownloadURL(fileRef);
 }
 

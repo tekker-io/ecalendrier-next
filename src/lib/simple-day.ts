@@ -1,7 +1,7 @@
 /**
- * Format of a day edited with the simple editor: one optional photo and a
- * text, stored as Quill-compatible HTML so that the advanced editor and the
- * public calendar can display it without any change.
+ * Format of a day edited with the simple editor: one optional media (photo or
+ * video) and a text, stored as Quill-compatible HTML so that the advanced
+ * editor and the public calendar can display it without any change.
  *
  * The file starts with a marker comment. Quill drops HTML comments when it
  * loads a document, so a day saved from the advanced editor automatically
@@ -12,15 +12,20 @@ export const SIMPLE_MARKER = "<!-- casedujour:simple -->";
 
 /** Free plan limit for a day (photo file or advanced editor HTML) */
 export const FREE_SIZE_LIMIT = 2_000_000;
-/** Safety limit for everyone, not advertised */
+/** Premium limit (videos), also a safety limit for photos */
 export const MAX_SIZE_LIMIT = 100_000_000;
 
-export type PhotoSize = { width: number; height: number };
+/** Class of uploaded videos, also registered as a Quill format */
+export const UPLOADED_VIDEO_CLASS = "ql-uploaded-video";
+
+export type MediaType = "image" | "video";
+export type MediaSize = { width: number; height: number };
 
 export type SimpleDay = {
-  photoUrl: string | null;
-  /** Written on the img tag so the browser reserves its space while loading */
-  photoSize?: PhotoSize | null;
+  mediaUrl: string | null;
+  mediaType: MediaType;
+  /** Written on the tag so the browser reserves its space while loading */
+  mediaSize?: MediaSize | null;
   text: string;
 };
 
@@ -41,19 +46,42 @@ export function headingLevel(text: string) {
   return 1;
 }
 
-export function buildSimpleHtml({ photoUrl, photoSize, text }: SimpleDay) {
+/**
+ * width/height give the ratio so the browser reserves the space before
+ * loading. The width is capped so the height never exceeds 80vh (the
+ * max-height of medias): the box always matches the displayed media.
+ * Quill drops the style attribute, the CSS fallback handles that case.
+ */
+function sizeAttributes(size: MediaSize | null | undefined) {
+  if (!size) return "";
+  return (
+    ` width="${size.width}" height="${size.height}"` +
+    ` style="width: min(100%, calc(80vh * ${size.width} / ${size.height})); height: auto;"`
+  );
+}
+
+/** Removes the #t=… fragment added to videos */
+function stripFragment(url: string) {
+  return url.split("#")[0];
+}
+
+export function buildSimpleHtml({
+  mediaUrl,
+  mediaType,
+  mediaSize,
+  text,
+}: SimpleDay) {
   const parts = [SIMPLE_MARKER];
-  if (photoUrl) {
-    // width/height give the ratio so the browser reserves the space before
-    // loading. The width is capped so the height never exceeds 80vh (the
-    // max-height of images): the box always matches the displayed photo.
-    // Quill drops the style attribute, the CSS fallback handles that case.
-    const size = photoSize
-      ? ` width="${photoSize.width}" height="${photoSize.height}"` +
-        ` style="width: min(100%, calc(80vh * ${photoSize.width} / ${photoSize.height})); height: auto;"`
-      : "";
+  if (mediaUrl && mediaType === "image") {
     parts.push(
-      `<p class="ql-align-center"><img src="${escapeHtml(photoUrl)}"${size}></p>`
+      `<p class="ql-align-center"><img src="${escapeHtml(mediaUrl)}"${sizeAttributes(mediaSize)}></p>`
+    );
+  }
+  if (mediaUrl && mediaType === "video") {
+    // #t=0.1 makes iOS display the first frame instead of a black box
+    const src = `${stripFragment(mediaUrl)}#t=0.1`;
+    parts.push(
+      `<video class="${UPLOADED_VIDEO_CLASS}" src="${escapeHtml(src)}" controls playsinline preload="metadata"${sizeAttributes(mediaSize)}></video>`
     );
   }
   const level = headingLevel(text);
@@ -70,10 +98,14 @@ export function hasSimpleMarker(html: string) {
   return html.trimStart().startsWith(SIMPLE_MARKER);
 }
 
-export function readPhotoSize(img: Element | null | undefined) {
-  const width = Number(img?.getAttribute("width"));
-  const height = Number(img?.getAttribute("height"));
+export function readMediaSize(el: Element | null | undefined) {
+  const width = Number(el?.getAttribute("width"));
+  const height = Number(el?.getAttribute("height"));
   return width > 0 && height > 0 ? { width, height } : null;
+}
+
+function isUploadedVideo(el: Element) {
+  return el.tagName === "VIDEO" && el.classList.contains(UPLOADED_VIDEO_CLASS);
 }
 
 function onlyLineBreaks(el: Element) {
@@ -81,14 +113,16 @@ function onlyLineBreaks(el: Element) {
 }
 
 /**
- * Reads HTML made of at most one photo paragraph and plain text blocks.
- * Returns null if the content has anything else (formatting, several photos,
- * videos…), meaning it can only be edited with the advanced editor.
+ * Reads HTML made of at most one media (photo paragraph or uploaded video)
+ * and plain text blocks. Returns null if the content has anything else
+ * (formatting, several medias, YouTube videos…), meaning it can only be edited
+ * with the advanced editor.
  */
 export function parseSimpleHtml(html: string): SimpleDay | null {
   const doc = new DOMParser().parseFromString(html, "text/html");
-  let photoUrl: string | null = null;
-  let photoSize: PhotoSize | null = null;
+  let mediaUrl: string | null = null;
+  let mediaType: MediaType = "image";
+  let mediaSize: MediaSize | null = null;
   const lines: string[] = [];
 
   for (const node of Array.from(doc.body.childNodes)) {
@@ -101,16 +135,19 @@ export function parseSimpleHtml(html: string): SimpleDay | null {
     const el = node as Element;
     const text = el.textContent?.trim() ?? "";
 
-    if (
+    const isImageParagraph =
       el.tagName === "P" &&
       el.children.length === 1 &&
       el.children[0].tagName === "IMG" &&
-      !text
-    ) {
-      if (photoUrl) return null;
-      photoUrl = el.children[0].getAttribute("src");
-      if (!photoUrl) return null;
-      photoSize = readPhotoSize(el.children[0]);
+      !text;
+    if (isImageParagraph || isUploadedVideo(el)) {
+      if (mediaUrl) return null;
+      const mediaEl = isImageParagraph ? el.children[0] : el;
+      const src = mediaEl.getAttribute("src");
+      if (!src) return null;
+      mediaType = isImageParagraph ? "image" : "video";
+      mediaUrl = mediaType === "video" ? stripFragment(src) : src;
+      mediaSize = readMediaSize(mediaEl);
       continue;
     }
     if (["P", "H1", "H2", "H3"].includes(el.tagName) && onlyLineBreaks(el)) {
@@ -120,27 +157,33 @@ export function parseSimpleHtml(html: string): SimpleDay | null {
     return null;
   }
 
-  return { photoUrl, photoSize, text: lines.join("\n") };
+  return { mediaUrl, mediaType, mediaSize, text: lines.join("\n") };
 }
 
 /**
  * Lossy conversion used when leaving the advanced editor for the simple one:
- * keeps the first photo and the text of each block.
+ * keeps the first photo or uploaded video and the text of each block.
  */
 export function extractSimpleDay(html: string): SimpleDay {
   const doc = new DOMParser().parseFromString(html, "text/html");
-  const img = doc.body.querySelector("img");
-  const photoUrl = img?.getAttribute("src") ?? null;
+  const media = doc.body.querySelector(`img, video.${UPLOADED_VIDEO_CLASS}`);
+  const mediaType: MediaType = media?.tagName === "VIDEO" ? "video" : "image";
+  const src = media?.getAttribute("src") ?? null;
   const lines = Array.from(
     doc.body.querySelectorAll("p, h1, h2, h3, h4, h5, h6, li, blockquote, pre")
   )
     .map((el) => el.textContent?.trim() ?? "")
     .filter(Boolean);
-  return { photoUrl, photoSize: readPhotoSize(img), text: lines.join("\n") };
+  return {
+    mediaUrl: src && mediaType === "video" ? stripFragment(src) : src,
+    mediaType,
+    mediaSize: readMediaSize(media),
+    text: lines.join("\n"),
+  };
 }
 
 export function isEmptySimpleDay(day: SimpleDay) {
-  return !day.photoUrl && !day.text.trim();
+  return !day.mediaUrl && !day.text.trim();
 }
 
 /** "4,2 Mo" */
