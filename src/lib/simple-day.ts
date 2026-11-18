@@ -78,8 +78,12 @@ export function buildSimpleHtml({
     );
   }
   if (mediaUrl && mediaType === "video") {
-    // #t=0.1 makes iOS display the first frame instead of a black box
-    const src = `${stripFragment(mediaUrl)}#t=0.1`;
+    // #t=0.1 makes iOS display the first frame instead of a black box.
+    // Not on blob: URLs (preview of a video not uploaded yet): Safari can't
+    // play them with a fragment.
+    const src = mediaUrl.startsWith("blob:")
+      ? mediaUrl
+      : `${stripFragment(mediaUrl)}#t=0.1`;
     parts.push(
       `<video class="${UPLOADED_VIDEO_CLASS}" src="${escapeHtml(src)}" controls playsinline preload="metadata"${sizeAttributes(mediaSize)}></video>`
     );

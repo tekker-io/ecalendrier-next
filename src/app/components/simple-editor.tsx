@@ -14,7 +14,7 @@ import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import StarIcon from "@mui/icons-material/Star";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { PremiumDialog } from "./premium-dialog";
 import { Spinner } from "./spinner";
@@ -26,17 +26,29 @@ export type SimpleMedia =
 
 export function useMediaPreviewUrl(media: SimpleMedia | null) {
   const localBlob = media?.kind === "local" ? media.blob : null;
-  const objectUrl = useMemo(
-    () => (localBlob ? URL.createObjectURL(localBlob) : null),
-    [localBlob],
-  );
+  // Created and revoked in the same effect: React may run effects twice (dev
+  // strict mode), a URL created during render could be revoked while still
+  // displayed. Safari loads videos lazily and then fails on revoked URLs.
+  const [objectUrl, setObjectUrl] = useState<{
+    blob: Blob;
+    url: string;
+  } | null>(null);
   useEffect(() => {
-    return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
-  }, [objectUrl]);
+    if (!localBlob) return;
+    const url = URL.createObjectURL(localBlob);
+    setObjectUrl({ blob: localBlob, url });
+    return () => URL.revokeObjectURL(url);
+  }, [localBlob]);
   if (!media) return null;
-  return media.kind === "remote" ? media.url : objectUrl;
+  if (media.kind === "remote") return media.url;
+  // Ignores the URL of a previous blob until the effect has run
+  return objectUrl?.blob === media.blob ? objectUrl.url : null;
+}
+
+/** Shows the first frame on iOS, which otherwise displays a black box */
+function showFirstFrame(e: React.SyntheticEvent<HTMLVideoElement>) {
+  const video = e.currentTarget;
+  if (video.currentTime === 0) video.currentTime = 0.1;
 }
 
 function isVideoFile(file: File) {
@@ -246,10 +258,12 @@ export function SimpleEditor({
         <div className="flex flex-col items-center gap-2">
           {media.type === "video" ? (
             <video
-              src={`${previewUrl}#t=0.1`}
+              // No #t=0.1 fragment here: Safari fails on blob: URLs with it
+              src={previewUrl}
               controls
               playsInline
               preload="metadata"
+              onLoadedMetadata={showFirstFrame}
               className="max-h-[45vh] max-w-full rounded bg-black"
             />
           ) : (
