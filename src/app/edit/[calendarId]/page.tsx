@@ -6,8 +6,10 @@ import CalendarEdit from "./calendar-edit";
 
 export default async function CalendarPage({
   params,
+  searchParams,
 }: {
   params: { calendarId: string };
+  searchParams: Promise<{ created?: string | string[] }>;
 }) {
   const beforeGetUserFromCookie = Date.now();
   const user = await getUserFromCookie();
@@ -53,7 +55,11 @@ export default async function CalendarPage({
       ) : calendar.author !== user.uid ? (
         <p>Vous n&apos;avez pas accès à ce calendrier.</p>
       ) : (
-        <CalendarEdit calendar={calendar} premium={premium} />
+        <CalendarEdit
+          calendar={calendar}
+          premium={premium}
+          justCreated={(await searchParams).created === "1"}
+        />
       )}
     </>
   );

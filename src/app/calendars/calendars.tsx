@@ -11,7 +11,9 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { Button } from "../components/button";
 import { Spinner } from "../components/spinner";
 import { CalendarList } from "./page";
@@ -24,20 +26,14 @@ function AddCalendarDialog({
   onClose,
 }: {
   open: boolean;
-  onClose: (data?: { id: string; name: string }) => void;
+  onClose: () => void;
 }) {
+  const router = useRouter();
   const [dates, setDates] = useState("christmas");
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState(christmasStartDate);
   const [endDate, setEndDate] = useState(christmasEndDate);
   const [loading, setLoading] = useState(false);
-
-  function reset() {
-    setName("");
-    setDates("christmas");
-    setStartDate(christmasStartDate);
-    setEndDate(christmasEndDate);
-  }
 
   async function onSubmit(e: React.FormEvent) {
     const auth = getFirebaseAuth();
@@ -54,21 +50,27 @@ function AddCalendarDialog({
       endDate: dates === "christmas" ? christmasEndDate : endDate,
     };
 
-    const calendarCollection = collection(firestore, "/calendars");
-    const data = await addDoc(calendarCollection, calendarData);
-    trackMetaEvent(
-      "CalendrierCree",
-      calendarCreatedEventId(data.id),
-      {},
-      { calendarId: data.id }
-    );
-    setLoading(false);
-    reset();
-    onClose({ id: data.id, name: name });
+    try {
+      const calendarCollection = collection(firestore, "/calendars");
+      const data = await addDoc(calendarCollection, calendarData);
+      trackMetaEvent(
+        "CalendrierCree",
+        calendarCreatedEventId(data.id),
+        {},
+        { calendarId: data.id }
+      );
+      // Straight to the new calendar so people start filling the days. The
+      // dialog keeps its spinner until the edit page replaces this one.
+      router.push(`/edit/${data.id}?created=1`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Impossible de créer le calendrier, réessayez.");
+      setLoading(false);
+    }
   }
 
   return (
-    <Dialog open={open} onClose={() => onClose()}>
+    <Dialog open={open} onClose={() => !loading && onClose()}>
       <DialogContent className="p-10">
         <form onSubmit={onSubmit}>
           <h2 className="text-3xl pb-8 font-bold">
@@ -135,11 +137,10 @@ function AddCalendarDialog({
 
 export function Calendars({ calendars }: { calendars: CalendarList }) {
   const [addCalendarOpen, setAddCalendarOpen] = useState(false);
-  const [localCalendars, setLocalCalendars] = useState(calendars);
 
   return (
     <div className="mb-6 flex flex-wrap">
-      {localCalendars.map((c) => (
+      {calendars.map((c) => (
         <Link
           key={c.id}
           href={`/edit/${c.id}`}
@@ -150,12 +151,7 @@ export function Calendars({ calendars }: { calendars: CalendarList }) {
       ))}
       <AddCalendarDialog
         open={addCalendarOpen}
-        onClose={(calendar) => {
-          setAddCalendarOpen(false);
-          if (calendar) {
-            setLocalCalendars((prev) => [...prev, calendar]);
-          }
-        }}
+        onClose={() => setAddCalendarOpen(false)}
       />
       <div
         onClick={() => setAddCalendarOpen(true)}
