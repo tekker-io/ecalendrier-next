@@ -1,9 +1,5 @@
 import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
-import {
-  PREMIUM_FEATURES,
-  PREMIUM_PRICE,
-  PremiumFeature,
-} from "@/lib/premium";
+import { PREMIUM_FEATURES, PREMIUM_PRICE, PremiumFeature } from "@/lib/premium";
 import { getPaidPurchase } from "@/lib/stripe";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import CasinoIcon from "@mui/icons-material/Casino";
@@ -77,7 +73,7 @@ export default async function PremiumPage({
   return (
     <>
       {purchase && <PurchaseTracker purchase={purchase} />}
-      <TopBar />
+      <TopBar account={{ email: user.email ?? null, premium: !!premium }} />
       <main className="max-w-3xl mx-auto flex flex-col gap-12">
         <section className="flex flex-col items-center text-center gap-5">
           <span className="flex items-center gap-1 rounded-full bg-yellow-400 text-black font-bold text-sm px-3 py-1">
@@ -139,7 +135,9 @@ export default async function PremiumPage({
         <section className="bg-black/30 rounded-lg p-6 flex gap-4">
           <FavoriteIcon className="shrink-0 text-red" fontSize="large" />
           <div>
-            <h2 className="font-bold text-lg">Soutenez un projet indépendant</h2>
+            <h2 className="font-bold text-lg">
+              Soutenez un projet indépendant
+            </h2>
             <p className="opacity-90">
               Acheter le mode premium permet aussi de soutenir le développement
               de l&apos;application pour qu&apos;elle puisse perdurer dans le

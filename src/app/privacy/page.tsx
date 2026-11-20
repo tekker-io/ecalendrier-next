@@ -1,10 +1,16 @@
+import admin, { getUserFromCookie } from "@/lib/firebaseAdmin";
 import Link from "next/link";
 import { TopBar } from "../components/top-bar";
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const user = await getUserFromCookie();
+  const premium = user
+    ? !!(await admin.firestore().doc(`users/${user.uid}`).get()).get("premium")
+    : false;
+
   return (
     <>
-      <TopBar />
+      <TopBar account={user ? { email: user.email ?? null, premium } : null} />
       <div>
         <h1 className="text-5xl mb-2">Politique de confidentialité</h1>
         <p className="mb-1 italic">Dernière mise à jour : 10 novembre 2026</p>
@@ -17,8 +23,8 @@ export default function PrivacyPage() {
 
         <h2 className="text-3xl mb-2">Responsable du traitement</h2>
         <p className="mb-4">
-          Case du jour est une application développée et éditée par Tekker,
-          qui est responsable du traitement des données décrites ci-dessous.
+          Case du jour est une application développée et éditée par Tekker, qui
+          est responsable du traitement des données décrites ci-dessous.
         </p>
 
         <h2 className="text-3xl mb-2">Données collectées</h2>
@@ -26,15 +32,15 @@ export default function PrivacyPage() {
         <ul className="list-disc list-inside mb-4">
           <li>
             <strong>Compte</strong> : lors de la connexion avec Google, nous
-            recevons votre identifiant Google, votre adresse email, votre nom
-            et votre prénom. Lors de la connexion par email, nous conservons
+            recevons votre identifiant Google, votre adresse email, votre nom et
+            votre prénom. Lors de la connexion par email, nous conservons
             uniquement votre adresse email, à laquelle nous envoyons vos liens
             de connexion.
           </li>
           <li>
-            <strong>Calendriers</strong> : le nom, les dates, les réglages et
-            le contenu des cases que vous créez (textes, images, vidéos ou
-            liens que vous y ajoutez).
+            <strong>Calendriers</strong> : le nom, les dates, les réglages et le
+            contenu des cases que vous créez (textes, images, vidéos ou liens
+            que vous y ajoutez).
           </li>
           <li>
             <strong>Mode premium</strong> : le statut premium de votre compte.
@@ -42,10 +48,9 @@ export default function PrivacyPage() {
             jamais accès à vos coordonnées bancaires.
           </li>
           <li>
-            <strong>Statistiques d&apos;utilisation</strong> : pages
-            consultées et actions effectuées sur le site (création d&apos;un
-            calendrier, ajout d&apos;une image…), type d&apos;appareil et de
-            navigateur.
+            <strong>Statistiques d&apos;utilisation</strong> : pages consultées
+            et actions effectuées sur le site (création d&apos;un calendrier,
+            ajout d&apos;une image…), type d&apos;appareil et de navigateur.
           </li>
           <li>
             <strong>Mesure publicitaire (uniquement avec votre accord)</strong>{" "}
@@ -63,9 +68,7 @@ export default function PrivacyPage() {
             Vous permettre de créer, modifier et partager vos calendriers
             (exécution du service que vous demandez).
           </li>
-          <li>
-            Vous identifier et sécuriser l&apos;accès à vos calendriers.
-          </li>
+          <li>Vous identifier et sécuriser l&apos;accès à vos calendriers.</li>
           <li>Activer les fonctionnalités premium après votre paiement.</li>
           <li>
             Mesurer l&apos;audience et améliorer l&apos;application (intérêt
@@ -74,8 +77,8 @@ export default function PrivacyPage() {
         </ul>
         <ul className="list-disc list-inside mb-4">
           <li>
-            Si vous l&apos;acceptez, mesurer l&apos;efficacité de nos
-            publicités sur Facebook et Instagram (consentement).
+            Si vous l&apos;acceptez, mesurer l&apos;efficacité de nos publicités
+            sur Facebook et Instagram (consentement).
           </li>
         </ul>
         <p className="mb-4">
@@ -86,8 +89,8 @@ export default function PrivacyPage() {
         <h2 className="text-3xl mb-2">Visibilité des calendriers</h2>
         <p className="mb-4">
           Un calendrier est accessible à toute personne disposant de son lien.
-          Ne partagez ce lien qu&apos;avec les personnes à qui le calendrier
-          est destiné, et évitez d&apos;y placer des informations sensibles.
+          Ne partagez ce lien qu&apos;avec les personnes à qui le calendrier est
+          destiné, et évitez d&apos;y placer des informations sensibles.
         </p>
 
         <h2 className="text-3xl mb-2">Cookies et traceurs</h2>
@@ -95,8 +98,8 @@ export default function PrivacyPage() {
           <li>
             <strong>Cookie de session</strong> : un cookie technique nommé
             &quot;session&quot; vous garde connecté pendant 5 jours. Il est
-            indispensable au fonctionnement du site et est supprimé lorsque
-            vous vous déconnectez.
+            indispensable au fonctionnement du site et est supprimé lorsque vous
+            vous déconnectez.
           </li>
           <li>
             <strong>Mesure d&apos;audience</strong> : Case du jour utilise
@@ -111,8 +114,8 @@ export default function PrivacyPage() {
             l&apos;API de conversion de Meta pour mesurer les résultats de ses
             publicités. Le pixel dépose les cookies &quot;_fbp&quot; et
             &quot;_fbc&quot;. Votre choix est conservé 6 mois dans un cookie
-            nommé &quot;cdj_consent&quot;. Vous pouvez le modifier à tout
-            moment grâce au lien « Gérer les cookies » en bas de page.
+            nommé &quot;cdj_consent&quot;. Vous pouvez le modifier à tout moment
+            grâce au lien « Gérer les cookies » en bas de page.
           </li>
         </ul>
 
@@ -124,8 +127,8 @@ export default function PrivacyPage() {
         <ul className="list-disc list-inside mb-1">
           <li>
             <strong>Google Firebase</strong> (Google Ireland Ltd.) :
-            authentification, base de données et stockage des fichiers,
-            hébergés en Europe.
+            authentification, base de données et stockage des fichiers, hébergés
+            en Europe.
           </li>
           <li>
             <strong>Google Analytics</strong> (Google Ireland Ltd.) : mesure
@@ -142,8 +145,8 @@ export default function PrivacyPage() {
         </ul>
         <p className="mb-4">
           Certains de ces prestataires peuvent transférer des données hors de
-          l&apos;Union européenne, notamment aux États-Unis. Ces transferts
-          sont encadrés par le Data Privacy Framework UE–États-Unis ou par les
+          l&apos;Union européenne, notamment aux États-Unis. Ces transferts sont
+          encadrés par le Data Privacy Framework UE–États-Unis ou par les
           clauses contractuelles types de la Commission européenne.
         </p>
 
@@ -166,8 +169,8 @@ export default function PrivacyPage() {
             mois.
           </li>
           <li>
-            Les données de mesure publicitaire sont conservées par Meta selon
-            sa propre politique de conservation.
+            Les données de mesure publicitaire sont conservées par Meta selon sa
+            propre politique de conservation.
           </li>
         </ul>
 
@@ -175,10 +178,10 @@ export default function PrivacyPage() {
         <p className="mb-1">
           Vous disposez à tout moment d&apos;un droit d&apos;accès, de
           rectification, d&apos;effacement, de limitation, de portabilité et
-          d&apos;opposition sur vos données. Vous pouvez supprimer vous-même
-          vos calendriers depuis l&apos;application ; pour toute autre demande,
-          y compris la suppression complète de votre compte, contactez-nous
-          (voir ci-dessous).
+          d&apos;opposition sur vos données. Vous pouvez supprimer vous-même vos
+          calendriers depuis l&apos;application ; pour toute autre demande, y
+          compris la suppression complète de votre compte, contactez-nous (voir
+          ci-dessous).
         </p>
         <p className="mb-4">
           Si vous estimez que vos droits ne sont pas respectés, vous pouvez

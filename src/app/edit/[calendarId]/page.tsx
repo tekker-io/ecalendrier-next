@@ -17,7 +17,7 @@ export default async function CalendarPage({
     redirect("/");
   }
   console.log(
-    `getUserFromCookie took ${Date.now() - beforeGetUserFromCookie}ms`
+    `getUserFromCookie took ${Date.now() - beforeGetUserFromCookie}ms`,
   );
   const db = admin.firestore();
 
@@ -49,7 +49,7 @@ export default async function CalendarPage({
 
   return (
     <>
-      <TopBar />
+      <TopBar account={{ email: user.email ?? null, premium: !!premium }} />
       {!calendar ? (
         <p>Ce lien est invalide</p>
       ) : calendar.author !== user.uid ? (
