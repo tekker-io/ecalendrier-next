@@ -18,13 +18,13 @@ export function ScreenTracker() {
   useEffect(() => {
     if (pathname == "/") {
       sendScreenView("app-home");
-    } else if (pathname.startsWith("/edit/")) {
+    } else if (pathname.startsWith("/edit")) {
       sendScreenView("app-edit-calendar");
-    } else if (pathname.startsWith("/calendars/")) {
+    } else if (pathname.startsWith("/calendars")) {
       sendScreenView("app-calendars");
-    } else if (pathname.startsWith("/premium/")) {
+    } else if (pathname.startsWith("/premium")) {
       sendScreenView("app-premium");
-    } else if (pathname.startsWith("/privacy/")) {
+    } else if (pathname.startsWith("/privacy")) {
       sendScreenView("app-privacy");
     } else {
       sendScreenView("app-calendar");
