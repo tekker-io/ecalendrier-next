@@ -58,6 +58,17 @@ class UploadedVideo extends BlockEmbed {
 
 Quill.register(UploadedVideo);
 
+/**
+ * When a video (uploaded or YouTube) is the last block, there is no line
+ * after it: the caret can't go there, so nothing can be typed below the video
+ * and it can't be removed with Backspace. Adds an empty line in that case.
+ */
+function ensureLineAfterLastEmbed(quill) {
+  if (quill.scroll.children.tail instanceof BlockEmbed) {
+    quill.insertText(quill.getLength(), "\n", Quill.sources.SILENT);
+  }
+}
+
 export default function Editor({
   readOnly = false,
   defaultValue,
@@ -116,8 +127,11 @@ export default function Editor({
 
       quill.setContents(delta, "silent");
     }
+    ensureLineAfterLastEmbed(quill);
 
     quill.on(Quill.events.TEXT_CHANGE, () => {
+      // e.g. a video inserted at the end, or the text after it removed
+      ensureLineAfterLastEmbed(quill);
       if (onTextChangeRef.current) {
         onTextChangeRef.current(quill.root.innerHTML);
       }
